@@ -1,3 +1,4 @@
 Flask
 jsonify
 flask-cors
+requests

@@ -4,11 +4,11 @@ from flask import jsonify
 from flask_cors import CORS
 import os
 import json
-import jsonify
+from feed import NewsAPICalls
 
 app = Flask(__name__)
 CORS(app)
-
+appFeed = NewsAPICalls()
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -28,3 +28,12 @@ def get_categoy_bubble_data():
 
 # @app.route('/users/<id>/<job>',methods = ['GET'])
 # def get_users_with_job(id,job):
+@app.route('/feed', methods=['GET'])
+def get_ap_feed():
+   if request.method == 'GET':
+      return appFeed.get_headlines() # TODO for feed
+
+@app.route('/headlines', methods=['GET'])
+def get_ap_feed():
+   if request.method == 'GET':
+      return appFeed.get_headlines()

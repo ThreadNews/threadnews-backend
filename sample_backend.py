@@ -29,11 +29,13 @@ def get_categoy_bubble_data():
 # @app.route('/users/<id>/<job>',methods = ['GET'])
 # def get_users_with_job(id,job):
 @app.route('/feed', methods=['GET'])
-def get_ap_feed():
+def get_app_feed():
+   """ Get headlines from NewsAPI and return it """
    if request.method == 'GET':
       return appFeed.get_headlines() # TODO for feed
 
-@app.route('/headlines', methods=['GET'])
-def get_ap_feed():
+@app.route('/sources', methods=['GET'])
+def get_app_sources():
+   """ Get sources from NewsAPI and return it """
    if request.method == 'GET':
-      return appFeed.get_headlines()
+      return appFeed.get_sources()

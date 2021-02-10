@@ -2,27 +2,31 @@ from flask import json, jsonify
 import requests
 import configparser
 
-headlines = "https://newsapi.org/v2/top-headlines?country=us&apiKey={}"
-sources = "https://newsapi.org/v2/sources?apiKey={}"
+headlines = "https://newsapi.org/v2/top-headlines"
+sources = "https://newsapi.org/v2/sources"
 
 class NewsAPICalls:
     def __init__(self):
         config = configparser.ConfigParser()
-        config.read('config/api.conf')
+        config.read('.config/api.conf')
         self.api_key = config['NewsAPI']['key'].strip("\'")
 
-    def get_requests(self, url: str):
-        return requests.get(url)
+    def get_requests(self, url: str, data=None):
+        if data is None:
+            data = {'apiKey': self.api_key}
+        else:
+            data['apiKey'] = self.api_key
+        return requests.get(url, params=data)
 
     def get_headlines(self):
-        r = requests.get(headlines.format(self.api_key))
+        r = self.get_requests(headlines, data={'country': 'us'})
 
         if r.status_code != 200:
             return jsonify({"error": "internal errorr"}), 404
         return r.json()
 
     def get_sources(self):
-        r = requests.get(sources.format(self.api_key))
+        r = requests.get(sources)
 
         if r.status_code != 200:
             return jsonify({"error": "internal errorr"}), 404

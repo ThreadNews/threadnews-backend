@@ -41,7 +41,7 @@ def get_app_sources():
       return appFeed.get_sources()
 
 @app.route('/headlines', methods=['GET'])
-def get_app_feed():
+def get_app_headlines():
    """ Get headlines from NewsAPI and return it """
    if request.method == 'GET':
       return appFeed.get_headlines()

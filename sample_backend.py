@@ -32,10 +32,16 @@ def get_categoy_bubble_data():
 def get_app_feed():
    """ Get headlines from NewsAPI and return it """
    if request.method == 'GET':
-      return appFeed.get_headlines() # TODO for feed
+      return appFeed.get_headlines() # TODO currently returning headlines and not a feed
 
 @app.route('/sources', methods=['GET'])
 def get_app_sources():
    """ Get sources from NewsAPI and return it """
    if request.method == 'GET':
       return appFeed.get_sources()
+
+@app.route('/headlines', methods=['GET'])
+def get_app_feed():
+   """ Get headlines from NewsAPI and return it """
+   if request.method == 'GET':
+      return appFeed.get_headlines()

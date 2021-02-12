@@ -32,7 +32,18 @@ def get_categoy_bubble_data():
 def get_app_feed():
    """ Get headlines from NewsAPI and return it """
    if request.method == 'GET':
-      return appFeed.get_headlines() # TODO currently returning headlines and not a feed
+      q = request.args.get("q")
+      q_in_title = request.args.get("qInTitle")
+      sources = request.args.get("sources")
+      domains = request.args.get("domains")
+      exclude_domains = request.args.get("excludeDomains")
+      date_from = request.args.get("dateFrom")
+      date_to = request.args.get("dateTo")
+      lang = request.args.get("lang")
+      sort_by = request.args.get("sortBy")
+      page_size = request.args.get("pageSize")
+      page = request.args.get("page")
+      return appFeed.get_feed(q=q, q_in_title=q_in_title, sources=sources, domains=domains, exclude_domains=exclude_domains, date_from=date_from, date_to=date_to, lang=lang, sort_by=sort_by, page_size=page_size, page=page)
 
 @app.route('/sources', methods=['GET'])
 def get_app_sources():

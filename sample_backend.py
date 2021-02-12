@@ -30,7 +30,7 @@ def get_categoy_bubble_data():
 # def get_users_with_job(id,job):
 @app.route('/feed', methods=['GET'])
 def get_app_feed():
-   """ Get headlines from NewsAPI and return it """
+   """ Get custom feed from NewsAPI and return it """
    if request.method == 'GET':
       q = request.args.get("q")
       q_in_title = request.args.get("qInTitle")

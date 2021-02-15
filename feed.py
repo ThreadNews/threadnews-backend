@@ -37,7 +37,7 @@ class NewsAPICalls:
 
     def get_sources(self):
         """ retrieves the current sources gathered from NewsAPI """
-        r = requests.get(SOURCES)
+        r = self.get_requests(SOURCES)
 
         if r.status_code != 200:
             return jsonify({"error": "internal errorr"}), 404

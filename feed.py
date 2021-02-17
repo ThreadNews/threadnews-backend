@@ -32,7 +32,7 @@ class NewsAPICalls:
         r = self.get_requests(HEADLINES, data={'country': country})
 
         if r.status_code != 200:
-            return jsonify({"error": "internal errorr"}), 404
+            return jsonify({"error": "internal errorr"}), 500
         return r.json()
 
     def get_sources(self):
@@ -40,13 +40,13 @@ class NewsAPICalls:
         r = self.get_requests(SOURCES)
 
         if r.status_code != 200:
-            return jsonify({"error": "internal errorr"}), 404
+            return jsonify({"error": "internal errorr"}), 500
         return r.json()
 
     def get_feed(self, q: str, q_in_title=None, sources=None, domains=None, exclude_domains=None, date_from=None, date_to=None, lang="en", sort_by="publishedAt", page_size=100, page=1):
         """ retrieves a feed from a queried item plus any other parameters """
         if q is None or q == "":
-            return jsonify({"error": "empty query"}), 404
+            return jsonify({"error": "empty query"}), 400
 
         data = {'q': q}
 
@@ -70,5 +70,5 @@ class NewsAPICalls:
 
         r = self.get_requests(FEED, data=data)
         if r.status_code != 200:
-            return jsonify({"error": "internal error"}), 404
+            return jsonify({"error": "internal error"}), 500
         return r.json()

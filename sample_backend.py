@@ -32,7 +32,7 @@ def get_categoy_bubble_data():
       #update data in db - not implemented yet
       return Response(response={},status=404)
 
-@app.route('/theads/<interest>/<n>', methods=["GET"])
+@app.route('/threads/<interest>/<n>', methods=["GET"])
 def get_interest_thread(interest,n):
    articles = client.Articles.allArticles.find({'main_topic':interest})
    print(articles)

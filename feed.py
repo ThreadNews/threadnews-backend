@@ -1,6 +1,7 @@
 from flask import jsonify
 import requests
 import configparser
+import logging 
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"
@@ -10,6 +11,8 @@ DEFAULT_LANG="en"
 DEFAULT_SORT="popularity"
 DEFAULT_SIZE=50
 STARTING_PAGE=1
+
+logger = logging.getLogger('root')
 
 class NewsAPICalls:
     """ Wrapper class for NewsAPI calls """
@@ -21,6 +24,7 @@ class NewsAPICalls:
 
     def get_requests(self, url: str, data=None):
         """ helper function, send a get request to a specified url and any parameters """
+        logger.info("{} {}".format(url, data))
         if data is None:
             data = {'apiKey': self.api_key}
         else:

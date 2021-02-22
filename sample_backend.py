@@ -9,9 +9,9 @@ import logger
 
 app = Flask(__name__)
 CORS(app)
-appFeed = NewsAPICalls()
 log = logger.setup_logger('root')
 log.debug('initalized logger')
+appFeed = NewsAPICalls()
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():

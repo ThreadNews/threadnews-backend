@@ -1,7 +1,9 @@
 from flask import jsonify
 import requests
 import configparser
+import os
 import logging 
+import sys
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"
@@ -19,8 +21,22 @@ class NewsAPICalls:
 
     def __init__(self):
         config = configparser.ConfigParser()
+        if not os.path.exists(".config"):
+            os.mkdir(".config")
+            config_file = open(".config/api.conf", 'w')
+            
+            config.add_section('NewsAPI')
+            config.set('NewsAPI', 'key', 'YOURKEYHERE')
+            config.write(config_file)
+            config_file.close()
+
+            logger.critical("missing api key, please add key to .config/api.conf")
+            
         config.read('.config/api.conf')
         self.api_key = config['NewsAPI']['key'].strip("\'")
+
+        if self.api_key == "YOURKEYHERE":
+            logger.critical("missing api key, please add key to .config/api.conf")
 
     def get_requests(self, url: str, data=None):
         """ helper function, send a get request to a specified url and any parameters """

@@ -128,4 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-config/api.conf
+# all private keys reside here
+.config/*

@@ -1,3 +1,5 @@
 Flask
 jsonify
 flask-cors
+pymongo
+beautifulsoup4

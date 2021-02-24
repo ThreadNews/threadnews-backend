@@ -5,9 +5,12 @@ from flask_cors import CORS
 import os
 import json
 from feed import NewsAPICalls
+import logger
 
 app = Flask(__name__)
 CORS(app)
+log = logger.setup_logger('root')
+log.debug('initalized logger')
 appFeed = NewsAPICalls()
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])

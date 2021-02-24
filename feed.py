@@ -1,6 +1,9 @@
 from flask import jsonify
 import requests
 import configparser
+import os
+import logging 
+import sys
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"
@@ -11,16 +14,41 @@ DEFAULT_SORT="popularity"
 DEFAULT_SIZE=50
 STARTING_PAGE=1
 
+logger = logging.getLogger('root')
+
 class NewsAPICalls:
     """ Wrapper class for NewsAPI calls """
 
     def __init__(self):
+        self.api_key = self._get_configuration()
+
+    def _get_configuration(self):
+        """ To keep private api keys private, please use the configuration file to keep keys private """
         config = configparser.ConfigParser()
+        if not os.path.exists(".config/api.conf"):
+            if not os.path.exists(".config"):
+                os.mkdir(".config")
+            config_file = open(".config/api.conf", 'w')
+            
+            config.add_section('NewsAPI')
+            config.set('NewsAPI', 'key', 'YOURKEYHERE')
+            config.write(config_file)
+            config_file.close()
+
+            logger.critical("missing api key, please add key to .config/api.conf")
+            
         config.read('.config/api.conf')
-        self.api_key = config['NewsAPI']['key'].strip("\'")
+        api_key = config['NewsAPI']['key'].strip("\'")
+
+        if api_key == "YOURKEYHERE":
+            logger.critical("missing api key, please add key to .config/api.conf")
+            return ""
+        logger.info("api key successfully identified in .config/api.conf")
+        return api_key
 
     def get_requests(self, url: str, data=None):
         """ helper function, send a get request to a specified url and any parameters """
+        logger.info("{} {}".format(url, data))
         if data is None:
             data = {'apiKey': self.api_key}
         else:

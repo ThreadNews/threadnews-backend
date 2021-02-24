@@ -8,10 +8,13 @@ import jsonify
 import uuid
 from feed import NewsAPICalls
 from pymongo import MongoClient
-from db_templates import get_sentiment
+import hashlib
 app = Flask(__name__)
-CORS(app)
+CORS(app) 
+import os 
 
+
+salt = os.urandom(64)
 
 sentiment_queue = []
 
@@ -54,9 +57,11 @@ def new_user(username,email,password):
       "last_name": "Doe",
       "email": email,
       "interests": [],
+      "pass_hash": hashlib.pbkdf2_hmac(
+                     'sha256',salt,1000)
    }
    result = client.Users.users.insert_one(user)
-   #do error check
+   # do error check
    return json.dumps(user)
 
 
@@ -70,7 +75,7 @@ def update_user_interests():
 @app.route('/liked_article/<userId>/<articleId>', methods=["POST"])
 def add_liked_article(userId,articleId):
    print('user id:',userId)
-   #add article id to user object
+   # add article id to user object
    u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})
    print(type(u),u)
    a = client.Articles.allArticles.update_one({'id':articleId},{'$inc':{'likes':1}})

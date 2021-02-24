@@ -6,6 +6,7 @@ import os
 import json
 import jsonify
 import uuid
+import hashlib
 from feed import NewsAPICalls
 from pymongo import MongoClient
 from db_templates import get_sentiment
@@ -14,7 +15,8 @@ CORS(app)
 
 
 sentiment_queue = []
-
+salt = open('salt.txt').readline()
+print("CURRENT SALT: ", salt)
 client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
@@ -45,15 +47,55 @@ def get_interest_thread(interest,n):
 # def get_users_with_job(id,job):
 
 
+@app.route('/login',methods=["POST"])
+def try_login():
+   status = {"status":"success"}
+   data = request.get_json(force=True)
+   print("data: ", data)
+   pass_hash = hashlib.sha512((data['password']+salt).encode('utf-8')).hexdigest()
+   user_objects_in_table = client.Users.users.find({'user_name':data.get("user_name")})
+   if user_objects_in_table.count > 0: 
+      for user in user_objects_in_table:
+         if(pass_hash == user_objects_in_table['pass_hash']):
+            status["user_name"] = data.get("user_name")
+            del user['_id']
+            status["user"] = user
+            return status
+            #return Response(response=status) 
+         else: 
+            return {"status":"failure"}
+      
+
+
+
+
+   
+
+
+
+   # if found 
+     # send another message to front end success logging in 
+
+   # if not found 
+      # send message back to front end 
+      # increment count how many times user has tried to login 
+
+
+   
+
+
 @app.route('/newUser/<username>/<email>/<password>', methods=["POST"])
 def new_user(username,email,password):
+   pass_hash = hashlib.sha512((password+salt).encode('utf-8')).hexdigest()
+   print("HASHED PASS:", pass_hash[:10], type(pass_hash))
    user = {
       "user_id": str(uuid.uuid1()),
-      "username": username,
+      "user_name": username,
       "first_name": "John",
       "last_name": "Doe",
       "email": email,
       "interests": [],
+      "pass_hash":pass_hash,
    }
    result = client.Users.users.insert_one(user)
    #do error check

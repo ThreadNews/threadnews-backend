@@ -13,9 +13,10 @@ class threadConfiguration:
             config_file = open(".config/api.conf", 'w')
             
             self.config.add_section('NewsAPI')
-            self.config.set('NewsAPI', 'key', 'YOURKEYHERE')
-
             self.config.add_section('MongoDB')
+
+            self.config.set('NewsAPI', 'key', 'YOURKEYHERE')
+            self.config.set('MongoDB', 'URl', 'YOURURLHERE')
             self.config.set('MongoDB', 'user', 'YOURUSERHERE')
             self.config.set('MongoDB', 'password', 'YOURPASSWORDHERE')
             self.config.write(config_file)

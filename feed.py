@@ -23,7 +23,8 @@ class NewsAPICalls:
         self.api_key = configFile['NewsAPI']['key'].strip("\'")
         if self.api_key == "YOURKEYHERE":
             logger.critical("missing api key, please add key to .config/api.conf")
-        logger.info("api key successfully identified in .config/api.conf")
+        else:
+            logger.info("api key successfully identified in .config/api.conf")
 
     def get_requests(self, url: str, data=None):
         """ helper function, send a get request to a specified url and any parameters """

@@ -6,12 +6,16 @@ import os
 import json
 from feed import NewsAPICalls
 import logger
+from config import threadConfiguration
+from database import threadDatabase
 
 app = Flask(__name__)
 CORS(app)
 log = logger.setup_logger('root')
+configFile = threadConfiguration()
 log.debug('initalized logger')
-appFeed = NewsAPICalls()
+appFeed = NewsAPICalls(configFile.get_configuration())
+database_client = threadDatabase(configFile.get_configuration())
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():

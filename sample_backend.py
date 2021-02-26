@@ -51,19 +51,45 @@ def get_interest_thread(interest,n):
 def try_login():
    status = {"status":"success"}
    data = request.get_json(force=True)
-   print("data: ", data)
-   pass_hash = hashlib.sha512((data['password']+salt).encode('utf-8')).hexdigest()
-   user_objects_in_table = client.Users.users.find({'user_name':data.get("user_name")})
-   if user_objects_in_table.count > 0: 
-      for user in user_objects_in_table:
-         if(pass_hash == user_objects_in_table['pass_hash']):
+   print("type data :", type(data))
+   print("data: ", data, data.keys())
+
+   #pass_hash = hashlib.sha512((data['password']+salt).encode('utf-8')).hexdigest()
+   pass_hash = "00e2a7f276ac9aa5c1ecbbab43059328479a3f5c9aac3d8811229b94fe7552d67179d497c41a497d844dfae069c2200a877b1f863d7580f5238eccd8e66e750a"
+   # user_objects_in_table = client.Users.users.find({'user_name':data.get("user_name")})
+   #print("username", data.get("username"))
+   user = client.Users.users.find_one({'email':data.get("email")})
+   print("user", type(user),user)
+   print('user keys:', user.keys())
+
+   count = client.Users.users.count 
+   print("count", count)
+   print("user fetched:", user)
+   if len(user.keys()) > 0: 
+      del user['_id']
+      if(pass_hash == user['pass_hash']):
             status["user_name"] = data.get("user_name")
-            del user['_id']
             status["user"] = user
             return status
-            #return Response(response=status) 
-         else: 
+      else:
             return {"status":"failure"}
+
+   status["user_name"] = data.get("user_name")
+   
+   #          del user['_id']
+   #          status["user"] = user
+   #          return status
+
+   # # if user_objects_in_table.count > 0: 
+   #    for user in user_objects_in_table:
+   #       if(pass_hash == user_objects_in_table['pass_hash']):
+   #          status["user_name"] = data.get("user_name")
+   #          del user['_id']
+   #          status["user"] = user
+   #          return status
+   #          #return Response(response=status) 
+   #       else: 
+   #          return {"status":"failure"}
       
 
 

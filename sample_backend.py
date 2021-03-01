@@ -63,3 +63,9 @@ def get_app_headlines():
    """ Get headlines from NewsAPI and return it """
    if request.method == 'GET':
       return appFeed.get_headlines()
+
+@app.route('/users', methods=['GET'])
+def get_users():
+   """ Get the users of ThreadNews"""
+   if request.method == 'GET':
+      return jsonify(database_client.get_users()), 200

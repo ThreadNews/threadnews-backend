@@ -69,3 +69,8 @@ def get_users():
    """ Get the users of ThreadNews"""
    if request.method == 'GET':
       return jsonify(database_client.get_users()), 200
+
+@app.route('/articles', methods=['GET'])
+def get_articles():
+   if request.method == 'GET':
+      return jsonify(database_client.get_articles()), 200

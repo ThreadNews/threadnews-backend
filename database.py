@@ -22,4 +22,4 @@ class threadDatabase:
         return json.loads(json.dumps(list(self.client.Users.users.find()), default=json_util.default))
 
     def get_articles(self, page=1):
-        return self.client.Articles.allArticles.find().skip((page-1)*100).limit((page-1)*100 + 100)
+        return json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*100).limit((page-1)*100 + 100)), default=json_util.default))

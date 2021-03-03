@@ -73,4 +73,7 @@ def get_users():
 @app.route('/articles', methods=['GET'])
 def get_articles():
    if request.method == 'GET':
-      return jsonify(database_client.get_articles()), 200
+      pages = request.args.get("pages")
+      if pages is None:
+         pages = 1
+      return database_client.get_articles(int(pages))

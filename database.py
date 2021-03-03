@@ -7,7 +7,7 @@ import logging
 import certifi
 
 logger = logging.getLogger('root')
-
+_SIZE=20
 class threadDatabase:
     def __init__(self, config):
         database, user, password = config['MongoDB']['URl'], config['MongoDB']['user'], config['MongoDB']['password']
@@ -22,4 +22,24 @@ class threadDatabase:
         return json.loads(json.dumps(list(self.client.Users.users.find()), default=json_util.default))
 
     def get_articles(self, page=1):
-        return json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*100).limit((page-1)*100 + 100)), default=json_util.default))
+        logger.info(f"getting articles: page number {page}")
+        payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
+        if len(payload) == 0:
+            return {"message": "no articles possible"}, 404
+        return payload, 200
+
+    def push_new_user(self, payload=None):
+        """ Should be dealt with the login authentication """
+        if payload is not None:
+            if self.Client.Users.users.find({"user_name": payload["user_name"]}) is not None:
+                logger.info("username already in use")
+            elif self.Client.Users.users.find({"email": payload["email"]}) is not None:
+                logger.info("email already in use")
+            else:
+                logger.info("adding new user")
+                self.Client.Users.users.insert_one(payload)
+                return 201
+            return 409
+        else:
+            logger.info("not possible to add user")
+            return 500

@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson import json_util
+import jsonify
 import pprint
 import uuid
 import json
@@ -26,7 +27,7 @@ class threadDatabase:
         payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
         if len(payload) == 0:
             return {"message": "no articles possible"}, 404
-        return payload, 200
+        return {"articles": payload, "page": page}, 200
 
     def push_new_user(self, payload=None):
         """ Should be dealt with the login authentication """

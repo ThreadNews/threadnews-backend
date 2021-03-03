@@ -19,10 +19,12 @@ class threadDatabase:
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
 
     def get_users(self):
+        """ Retrieves users """
         logger.info("getting users")
         return json.loads(json.dumps(list(self.client.Users.users.find()), default=json_util.default))
 
     def get_articles(self, page=1):
+        """ Retrieves articles """
         logger.info(f"getting articles: page number {page}")
         payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
         if len(payload) == 0:

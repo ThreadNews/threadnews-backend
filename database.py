@@ -23,6 +23,14 @@ class threadDatabase:
         logger.info("getting users")
         return json.loads(json.dumps(list(self.client.Users.users.find()), default=json_util.default))
 
+    def get_user(self, q=""):
+        """ Retrieves users """
+        logger.info("getting users")
+        return json.loads(json.dumps(list(self.client.Users.users.find(q)), default=json_util.default))
+
+    def get_user_count(self):
+        return self.client.Users.users.count
+
     def get_articles(self, page=1):
         """ Retrieves articles """
         logger.info(f"getting articles: page number {page}")

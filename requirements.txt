@@ -45,3 +45,4 @@ virtualenv-clone==0.5.4
 Werkzeug==1.0.1
 wrapt==1.11.2
 flask-jwt-extended==4.0.2
+bcrypt==3.2.0

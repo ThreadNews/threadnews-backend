@@ -19,6 +19,8 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+import bcrypt
+
 app = Flask(__name__)
 CORS(app)
 log = logger.setup_logger('root')
@@ -63,24 +65,25 @@ def get_interest_thread(interest,n):
 
 @app.route('/login',methods=["POST"])
 def try_login():
-   data = request.get_json(force=True)
-   print("type data :", type(data))
-   print("data: ", data, data.keys())
+   if request.method == 'POST':
+      data = request.get_json(force=True)
+      print("type data :", type(data))
+      print("data: ", data, data.keys())
 
-   curr_user = database_client.get_user({"email": data.get("email")})
-   if len(curr_user) == 0:
-      return {"error": "no user found"}, 404
-   
-   curr_user = curr_user[0]
-   if curr_user['pass_hash'] != data['pass_hash']:
-      return {"error": "password don't match"}, 400
+      curr_user = database_client.get_user({"email": data.get("email")})
+      if len(curr_user) == 0:
+         return {"error": "no user found"}, 404
+      
+      curr_user = curr_user[0]
+      if not bcrypt.checkpw(str.encode(data['password']), str.encode(curr_user['pass_hash'])):
+         return {"error": "password don't match"}, 400
 
-   # clean up user data for less exposure
-   curr_user.pop('pass_hash', None)
-   curr_user.pop('_id', None)
+      # clean up user data for less exposure
+      curr_user.pop('pass_hash', None)
+      curr_user.pop('_id', None)
 
-   access_token = create_access_token(identity=curr_user) # change if you want to use the difference
-   return {"access_token": access_token}, 200
+      access_token = create_access_token(identity=curr_user) # change if you want to use the difference
+      return {"access_token": access_token}, 200
    
 @app.route("/protected", methods=["GET"])
 @jwt_required()
@@ -89,22 +92,53 @@ def protected():
     current_user = get_jwt_identity()
     return {"logged_in_as": current_user}, 200
 
-@app.route('/newUser/<username>/<email>/<password>', methods=["POST"])
-def new_user(username,email,password):
-   pass_hash = hashlib.sha512((password+salt).encode('utf-8')).hexdigest()
-   print("HASHED PASS:", pass_hash[:10], type(pass_hash))
-   user = {
-      "user_id": str(uuid.uuid1()),
-      "user_name": username,
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": email,
-      "interests": [],
-      "pass_hash":pass_hash,
-   }
-   # result = client.Users.users.insert_one(user)
-   #do error check
-   return json.dumps(user)
+@app.route('/newUser', methods=["POST"])
+def new_user():
+   if request.method == 'POST':
+      data = request.get_json(force = True)
+
+      username = None
+      email = None
+      password = None
+
+      if data:
+         if 'username' in data:
+            username = data['username']
+         else:
+            return {'msg': 'username not found'}, 406
+         
+         if 'email' in data:
+            email = data['email']
+         else:
+            return {'msg': 'email not found'}, 406
+
+         if 'password' in data:
+            password = data['password']
+         else:
+            return {'msg': 'password not found'}, 406
+
+      salt = bcrypt.gensalt()
+      pass_hash = bcrypt.hashpw(str.encode(password), salt)
+      user = {
+         "user_id": str(uuid.uuid1()),
+         "user_name": username,
+         "first_name": "",
+         "last_name": "",
+         "email": email,
+         "interests": [],
+         "pass_hash":pass_hash.decode(),
+      }
+      log.info("successfully parsed new user information")
+      result = database_client.add_user(user)
+
+      if result['result'] == -1:
+         return {"msg": result["msg"]}, 404
+
+      # clean up user data for less exposure
+      user.pop('_id', None)
+      user.pop('pass_hash', None)
+      access_token = create_access_token(identity=user)
+      return {"msg": "user successfully added", "access_token": access_token}, 200
 
 
 @app.route('/update_interests', methods=["POST"])

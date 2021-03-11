@@ -43,4 +43,5 @@ urllib3==1.25.9
 virtualenv==20.0.23
 virtualenv-clone==0.5.4
 Werkzeug==1.0.1
-wrapt==1.11.2
+wrapt==1.11.2wrapt==1.11.2
+nltk

@@ -8,22 +8,32 @@ import jsonify
 import uuid
 import hashlib
 from feed import NewsAPICalls
-from pymongo import MongoClient
-from db_templates import get_sentiment
+# from pymongo import MongoClient
+# from db_templates import get_sentiment
 import logger
 from config import threadConfiguration
 from database import threadDatabase
+
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
+
+import bcrypt
 
 app = Flask(__name__)
 CORS(app)
 log = logger.setup_logger('root')
 configFile = threadConfiguration()
 log.debug('initalized logger')
+app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
 appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
-# database_client.push_new_headlines(max=20)
+jwt = JWTManager(app)
+
 sentiment_queue = []
-client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
+salt = open('salt.txt').readline()
+print("CURRENT SALT: ", salt)
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -56,93 +66,95 @@ def get_interest_thread(interest,n):
 
 @app.route('/login',methods=["POST"])
 def try_login():
-   status = {"status":"success"}
-   data = request.get_json(force=True)
-   print("type data :", type(data))
-   print("data: ", data, data.keys())
+   if request.method == 'POST':
+      data = request.get_json(force=True)
+      print("type data :", type(data))
+      print("data: ", data, data.keys())
 
-   pass_hash = "00e2a7f276ac9aa5c1ecbbab43059328479a3f5c9aac3d8811229b94fe7552d67179d497c41a497d844dfae069c2200a877b1f863d7580f5238eccd8e66e750a"
-   user = client.Users.users.find_one({'email':data.get("email")})
-   print("user", type(user),user)
-   print('user keys:', user.keys())
-   
-   if len(user.keys()) > 0: 
-      del user['_id']
-      if(pass_hash == user['pass_hash']):
-            status["user_name"] = data.get("user_name")
-            status["user"] = user
-            return status
-      else:
-            return {"status":"failure"}
-
-   status["user_name"] = data.get("user_name")
-   
-   #          del user['_id']
-   #          status["user"] = user
-   #          return status
-
-   # # if user_objects_in_table.count > 0: 
-   #    for user in user_objects_in_table:
-   #       if(pass_hash == user_objects_in_table['pass_hash']):
-   #          status["user_name"] = data.get("user_name")
-   #          del user['_id']
-   #          status["user"] = user
-   #          return status
-   #          #return Response(response=status) 
-   #       else: 
-   #          return {"status":"failure"}
+      curr_user = database_client.get_user({"email": data.get("email")})
+      if len(curr_user) == 0:
+         return {"error": "no user found"}, 404
       
+      curr_user = curr_user[0]
+      if not bcrypt.checkpw(str.encode(data['password']), str.encode(curr_user['pass_hash'])):
+         return {"error": "password don't match"}, 400
 
+      # clean up user data for less exposure
+      curr_user.pop('pass_hash', None)
+      curr_user.pop('_id', None)
 
-
-
+      access_token = create_access_token(identity=curr_user) # change if you want to use the difference
+      return {"access_token": access_token}, 200
    
+@app.route("/protected", methods=["GET"])
+@jwt_required()
+def protected():
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    return {"logged_in_as": current_user}, 200
 
+@app.route('/newUser', methods=["POST"])
+def new_user():
+   if request.method == 'POST':
+      data = request.get_json(force = True)
 
+      username = None
+      email = None
+      password = None
 
-   # if found 
-     # send another message to front end success logging in 
+      if data:
+         if 'username' in data:
+            username = data['username']
+         else:
+            return {'msg': 'username not found'}, 406
+         
+         if 'email' in data:
+            email = data['email']
+         else:
+            return {'msg': 'email not found'}, 406
 
-   # if not found 
-      # send message back to front end 
-      # increment count how many times user has tried to login 
+         if 'password' in data:
+            password = data['password']
+         else:
+            return {'msg': 'password not found'}, 406
 
+      salt = bcrypt.gensalt()
+      pass_hash = bcrypt.hashpw(str.encode(password), salt)
+      user = {
+         "user_id": str(uuid.uuid1()),
+         "user_name": username,
+         "first_name": "",
+         "last_name": "",
+         "email": email,
+         "interests": [],
+         "pass_hash":pass_hash.decode(),
+      }
+      log.info("successfully parsed new user information")
+      result = database_client.add_user(user)
 
-   
+      if result['result'] == -1:
+         return {"msg": result["msg"]}, 404
 
-
-@app.route('/newUser/<username>/<email>/<password>', methods=["POST"])
-def new_user(username,email,password):
-   pass_hash = hashlib.sha256((password).encode('utf-8')).hexdigest()
-   print("HASHED PASS:", pass_hash[:10], type(pass_hash))
-   user = {
-      "user_id": str(uuid.uuid1()),
-      "user_name": username,
-      "first_name": "John",
-      "last_name": "Doe",
-      "email": email,
-      "interests": [],
-      "pass_hash":pass_hash,
-   }
-   del user['_id']
-   result = client.Users.users.insert_one(user)
-   # do error check
-   return {"user":user}
+      # clean up user data for less exposure
+      user.pop('_id', None)
+      user.pop('pass_hash', None)
+      access_token = create_access_token(identity=user)
+      return {"msg": "user successfully added", "access_token": access_token}, 200
 
 
 @app.route('/update_interests', methods=["POST"])
 def update_user_interests():
    data = request.get_json(force=True)
    print(type(data))
-   client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
+   # client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
    return {}
 
 def add_liked_article(userId,articleId):
    print('user id:',userId)
    #add article id to user object
-   u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})
+   # u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})
    print(type(u),u)
-   a = client.Articles.allArticles.update_one({'id':articleId},{'$inc':{'likes':1}})
+   # a = client.Articles.allArticles.update_one({'id':articleId},{'$inc':{'likes':1}})
 
    return {}
 

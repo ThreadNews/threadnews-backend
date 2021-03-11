@@ -14,11 +14,13 @@ class threadConfiguration:
             
             self.config.add_section('NewsAPI')
             self.config.add_section('MongoDB')
+            self.config.add_section('JWT')
 
             self.config.set('NewsAPI', 'key', 'YOURKEYHERE')
             self.config.set('MongoDB', 'URl', 'YOURURLHERE')
             self.config.set('MongoDB', 'user', 'YOURUSERHERE')
             self.config.set('MongoDB', 'password', 'YOURPASSWORDHERE')
+            self.config.set('JWT', 'secret', 'YOURSECRETHERE')
             self.config.write(config_file)
             config_file.close()
 

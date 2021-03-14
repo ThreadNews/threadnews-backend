@@ -45,10 +45,10 @@ class threadDatabase:
     def get_user_count(self):
         return self.client.Users.users.count
 
-    def get_articles(self, page=1):
+    def get_articles(self, q={}, page=1):
         """ Retrieves articles """
-        logger.info(f"getting articles: page number {page}")
-        payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
+        logger.info(f"getting articles {q}: page number {page}")
+        payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find(q).skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
         if len(payload) == 0:
             return {"message": "no articles possible"}, 404
         return {"articles": payload, "page": page}, 200
@@ -68,3 +68,21 @@ class threadDatabase:
         else:
             logger.info("not possible to add user")
             return 500
+
+    def update_user_interest(self, user_id, add=None, remove=None):
+        if add:
+            self.client.Users.users.update_one({"user_id":user_id},
+                    {'$push':
+                        {'interests':
+                            { '$each': add }
+                        }
+                    })
+        
+        print(remove)
+        if remove:
+            self.client.Users.users.update_one({"user_id":user_id},
+                    {'$pull':
+                        { 'interests': 
+                            { '$in': remove }
+                        }
+                    })

@@ -32,9 +32,6 @@ database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
 
 sentiment_queue = []
-salt = open('salt.txt').readline()
-print("CURRENT SALT: ", salt)
-# client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -53,15 +50,13 @@ def get_categoy_bubble_data():
 
 @app.route('/threads/<interest>/<n>', methods=["GET"])
 def get_interest_thread(interest,n):
-   # articles = client.Articles.allArticles.find({'main_topic':interest})
+   articles = database_client.get_articles(q={'main_topic': interest}, page=n)
    print(articles)
    article_ls = []
    for article in articles:
       del article['_id']
       article_ls.append(article)
    return {'articles':article_ls}
-# @app.route('/users/<id>/<job>',methods = ['GET'])
-# def get_users_with_job(id,job):
 
 @app.route('/login',methods=["POST"])
 def try_login():
@@ -82,7 +77,7 @@ def try_login():
       curr_user.pop('pass_hash', None)
       curr_user.pop('_id', None)
 
-      access_token = create_access_token(identity=curr_user) # change if you want to use the difference
+      access_token = create_access_token(identity=curr_user)
       return {"access_token": access_token}, 200
    
 @app.route("/protected", methods=["GET"])
@@ -142,14 +137,17 @@ def new_user():
 
 
 @app.route('/update_interests', methods=["POST"])
+@jwt_required()
 def update_user_interests():
-   data = request.get_json(force=True)
-   print(type(data))
-   # client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
-   return {}
+   if request.method == 'POST':
+      current_user = get_jwt_identity()
+      data = request.get_json(force=True) # new interest should be added as {"add": [new interest], "remove": [interest]}
+      database_client.update_user_interest(current_user['user_id'], data['add'], data['remove'])
+      return {"msg": "success"}, 200
 
-@app.route('/liked_article/<userId>/<articleId>', methods=["POST"])
-def add_liked_article(userId,articleId):
+@app.route('/liked_article/<articleId>', methods=["POST"])
+@jwt_required()
+def add_liked_article(articleId):
    print('user id:',userId)
    #add article id to user object
    # u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})

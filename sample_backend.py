@@ -16,19 +16,21 @@ from database import threadDatabase
 import multiprocessing
 import atexit
 
-def feed_worker(db_client):
-    # this is where the feed updator will be
-    print("I'm the feed")
-    return
-
 app = Flask(__name__)
 CORS(app)
 log = logger.setup_logger('root')
 configFile = threadConfiguration()
 log.debug('initalized logger')
-appFeed = NewsAPICalls(configFile.get_configuration())
+
 database_client = threadDatabase(configFile.get_configuration())
-feed_process = multiprocessing.Process(target=feed_worker, args=(database_client,))
+
+def feed_worker():
+    # this is where the feed updator will be
+    appFeed = NewsAPICalls(configFile.get_configuration())
+    print("I'm the feed")
+    return
+
+feed_process = multiprocessing.Process(target=feed_worker)
 # sentiment_process = multiprocessing.Process(target=sentiment_worker, args=(database_client,))
 feed_process.start()
 

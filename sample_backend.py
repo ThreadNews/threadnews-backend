@@ -145,16 +145,16 @@ def update_user_interests():
 @jwt_required()
 def like_article(articleId):
    """ Add/Delete like to article and user """
-    if request.method == 'POST':
-        data = request.get_json()
-        current_user = get_jwt_identity()
-         if data['action']=='add':
-            database_client.push_new_like(userId,articleId,articleId)
-         if data['action']=='delete':
-            database_client.delete_like(data['user_id'],data['article_id'])
-         return 200
+   if request.method == 'POST':
+      data = request.get_json()
+      current_user = get_jwt_identity()
+      if data['action']=='add':
+         database_client.push_new_like(userId,articleId,articleId)
+      if data['action']=='delete':
+         database_client.delete_like(data['user_id'],data['article_id'])
+      return 200
 
-@app.route('/comment')
+@app.route('/comment', methods=['POST'])
 @jwt_required()
 def comment(article_id):
    """ Add comment to user and article """

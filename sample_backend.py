@@ -33,7 +33,6 @@ appFeed = NewsAPICalls(configFile.get_configuration())
 
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
-feed_process = multiprocessing.Process(target=feed_worker, args=(database_client,))
 
 database_client = threadDatabase(configFile.get_configuration())
 

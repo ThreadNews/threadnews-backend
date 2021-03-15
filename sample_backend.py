@@ -20,6 +20,13 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
 import bcrypt
+import multiprocessing
+import atexit
+
+def feed_worker(db_client):
+    # this is where the feed updator will be
+    print("I'm the feed")
+    return
 
 app = Flask(__name__)
 CORS(app)
@@ -30,6 +37,19 @@ app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
 appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
+feed_process = multiprocessing.Process(target=feed_worker, args=(database_client,))
+# sentiment_process = multiprocessing.Process(target=sentiment_worker, args=(database_client,))
+feed_process.start()
+
+def exit_handler():
+   feed_process.terminate()
+
+atexit.register(exit_handler)
+
+sentiment_queue = []
+salt = open('salt.txt').readline()
+print("CURRENT SALT: ", salt)
+client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():

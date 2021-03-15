@@ -13,6 +13,13 @@ from db_templates import get_sentiment
 import logger
 from config import threadConfiguration
 from database import threadDatabase
+import multiprocessing
+import atexit
+
+def feed_worker(db_client):
+    # this is where the feed updator will be
+    print("I'm the feed")
+    return
 
 app = Flask(__name__)
 CORS(app)
@@ -21,6 +28,14 @@ configFile = threadConfiguration()
 log.debug('initalized logger')
 appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
+feed_process = multiprocessing.Process(target=feed_worker, args=(database_client,))
+# sentiment_process = multiprocessing.Process(target=sentiment_worker, args=(database_client,))
+feed_process.start()
+
+def exit_handler():
+   feed_process.terminate()
+
+atexit.register(exit_handler)
 
 sentiment_queue = []
 salt = open('salt.txt').readline()

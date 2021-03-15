@@ -15,6 +15,7 @@ class threadDatabase:
             logger.critical("user or password has not been changed!")
         else:
             logger.info("database has been successfully hooked up")
+        self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
     def get_users(self):
         """ Retrieves users """
@@ -81,3 +82,29 @@ class threadDatabase:
                 article['tags'] = {}
                 self.client.Articles.allArticles.insert_one(article)
                 i+=1
+
+    def push_new_comment(self,user_name,article_id,comment):
+        #add comment to user document(comment, article_id)
+        self.client.Users.users.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'user_name':user_name}}})
+        #add comment to article document(comment,user_name)
+        self.client.Articles.allArticles.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'article_id':article_id}}})
+        return 200
+
+    def push_new_like(self,user_id,article_id):
+        #add like article doccument
+        self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
+        #add article id to user document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
+        return 200
+
+    def delete_like(self,user_id,article_id):
+            #add like article doccument
+            self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
+            #add article id to user document
+            self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
+            return 200
+
+    def update_bio(self,user_id,bio):
+        """ Updates user bio in user document """
+        self.client.User.users.update_one({'user_id':user_id},{'$set':{'bio':bio}})
+        return 200

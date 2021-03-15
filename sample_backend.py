@@ -13,7 +13,7 @@ from feed import NewsAPICalls
 import logger
 from config import threadConfiguration
 from database import threadDatabase
-
+from pymongo import MongoClient
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -30,10 +30,6 @@ app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
 appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
-
-sentiment_queue = []
-salt = open('salt.txt').readline()
-print("CURRENT SALT: ", salt)
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -52,32 +48,25 @@ def get_categoy_bubble_data():
 
 @app.route('/threads/<interest>/<n>', methods=["POST"])
 def get_interest_thread(interest,n):
-   if len(database_client.get_user(request.get_json()['email']).values())>0:
-      articles = client.Articles.allArticles.find({'main_topic':interest})
-      # print("dd", current_user.is_authenticated)
-      print(articles)
-      article_ls = []
-      for article in articles:
-         del article['_id']
-         article_ls.append(article)
-      return {'articles':article_ls}
-# @app.route('/users/<id>/<job>',methods = ['GET'])
-# def get_users_with_job(id,job):
+   articles=database_client.client.Articles.allArticles.find()
+   article_ls = []
+   for article in articles:
+      del article['_id']
+      article_ls.append(article)
+   return {'articles':article_ls}
+
 
 @app.route('/login',methods=["POST"])
 def try_login():
    if request.method == 'POST':
       data = request.get_json(force=True)
-      print("type data :", type(data))
-      print("data: ", data, data.keys())
-
       curr_user = database_client.get_user({"email": data.get("email")})
       if len(curr_user) == 0:
-         return {"error": "no user found"}, 404
+         return {"msg": "no user found"}, 404
       
       curr_user = curr_user[0]
       if not bcrypt.checkpw(str.encode(data['password']), str.encode(curr_user['pass_hash'])):
-         return {"error": "password don't match"}, 400
+         return {"msg": "password don't match"}, 400
 
       # clean up user data for less exposure
       curr_user.pop('pass_hash', None)
@@ -97,7 +86,6 @@ def protected():
 def new_user():
    if request.method == 'POST':
       data = request.get_json(force = True)
-
       username = None
       email = None
       password = None
@@ -149,14 +137,36 @@ def update_user_interests():
    # client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
    return {}
 
-def add_liked_article(userId,articleId):
-   print('user id:',userId)
-   #add article id to user object
-   # u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})
-   print(type(u),u)
-   # a = client.Articles.allArticles.update_one({'id':articleId},{'$inc':{'likes':1}})
+@jwt_required
+@app.route('/like', methods=["POST"])
+def like_article(articleId):
+   """ Add/Delete like to article and user """
+   data = request.get_json()
+   if data['action']=='add':
+      database_client.push_new_like(userId,articleId,articleId)
+   if data['action']=='delete':
+      database_client.delete_like(data['user_id'],data['article_id'])
+   return 200
 
-   return {}
+
+
+
+@app.route('/comment')
+@jwt_required()
+def comment(article_id):
+   """ Add comment to user and article """
+   data = request.get_json(force=True)
+   if data['action']=='add':
+      database_client.push_comment(data['user_id'],data['article_id'],data['comment'])
+
+#inprogress
+# @app.route('/update_profile')
+# @jwt_required()
+# def update_bio():
+#    """ Add comment to user and article """
+#    data = request.get_json(force=True)['bio']
+#    user_id = get_jwt_identity()['user_name']
+#    database_client.update_bio(user_id,bio)
 
 @app.route('/feed', methods=['GET'])
 def get_app_feed():
@@ -183,13 +193,13 @@ def get_app_sources():
 
 @app.route('/headlines', methods=['GET'])
 def get_app_headlines():
-   """ Get headlines from NewsAPI and return it """
+   """ Get headlines from NewsAPI and return itoh yea """
    if request.method == 'GET':
       return appFeed.get_headlines()
 
 @app.route('/users', methods=['GET'])
 def get_users():
-   """ Get the users of ThreadNews"""
+   """ Get the users of ThreadNews """
    if request.method == 'GET':
       return jsonify(database_client.get_users()), 200
 
@@ -200,3 +210,7 @@ def get_articles():
       if pages is None:
          pages = 1
       return database_client.get_articles(int(pages))
+
+
+
+      

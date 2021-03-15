@@ -27,6 +27,7 @@ log = logger.setup_logger('root')
 configFile = threadConfiguration()
 log.debug('initalized logger')
 app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
+
 appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
@@ -48,8 +49,8 @@ def get_categoy_bubble_data():
 
 @app.route('/threads/<interest>/<n>', methods=["POST"])
 def get_interest_thread(interest,n):
-   articles = database_client.get_articles(q={'main_topic': interest}, page=n)
-   #articles=database_client.client.Articles.allArticles.find()
+   #articles = database_client.get_articles(q={'main_topic': interest}, page=n)
+   articles=database_client.client.Articles.allArticles.find()
    print(articles)
 
    article_ls = []

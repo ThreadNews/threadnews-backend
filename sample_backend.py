@@ -30,11 +30,27 @@ configFile = threadConfiguration()
 log.debug('initalized logger')
 app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
 appFeed = NewsAPICalls(configFile.get_configuration())
+
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
 feed_process = multiprocessing.Process(target=feed_worker, args=(database_client,))
 
 database_client = threadDatabase(configFile.get_configuration())
+
+def feed_worker():
+    # this is where the feed updator will be
+    appFeed = NewsAPICalls(configFile.get_configuration())
+    print("I'm the feed")
+    return
+
+feed_process = multiprocessing.Process(target=feed_worker)
+# sentiment_process = multiprocessing.Process(target=sentiment_worker)
+feed_process.start()
+
+def exit_handler():
+   feed_process.terminate()
+
+atexit.register(exit_handler)
 
 def feed_worker():
     # this is where the feed updator will be

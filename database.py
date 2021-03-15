@@ -86,3 +86,11 @@ class threadDatabase:
                             { '$in': remove }
                         }
                     })
+
+    def add_likes_articles(self, user_id, article_id):
+        self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
+
+    def remove_likes_articles(self, user_id, article_id):
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id,}})
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$dec':{'likes':1}})

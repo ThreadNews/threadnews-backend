@@ -145,16 +145,13 @@ def update_user_interests():
       database_client.update_user_interest(current_user['user_id'], data['add'], data['remove'])
       return {"msg": "success"}, 200
 
-@app.route('/liked_article/<articleId>', methods=["POST"])
+@app.route('/liked_article/<article_id>', methods=["POST"])
 @jwt_required()
-def add_liked_article(articleId):
-   print('user id:',userId)
-   #add article id to user object
-   # u = client.Users.users.update_one({"user_id":userId},{'$push':{'liked_articles': articleId,}})
-   print(type(u),u)
-   # a = client.Articles.allArticles.update_one({'id':articleId},{'$inc':{'likes':1}})
-
-   return {}
+def add_liked_article(article_id):
+   if request.method == 'POST':
+      current_user = get_jwt_identity()
+      database_client.add_likes_articles(current_user['user_id'], article_id)
+      return {"msg": "added like to article"}, 200
 
 @app.route('/feed', methods=['GET'])
 def get_app_feed():

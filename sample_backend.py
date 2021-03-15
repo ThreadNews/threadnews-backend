@@ -48,7 +48,7 @@ def get_categoy_bubble_data():
       #update data in db - not implemented yet
       return Response(response={},status=404)
 
-@app.route('/threads/<interest>/<n>', methods=["GET"])
+@app.route('/threads/<interest>/<n>', methods=["POST"])
 def get_interest_thread(interest,n):
    articles = database_client.get_articles(q={'main_topic': interest}, page=n)
    print(articles)
@@ -152,6 +152,7 @@ def add_liked_article(article_id):
       current_user = get_jwt_identity()
       database_client.add_likes_articles(current_user['user_id'], article_id)
       return {"msg": "added like to article"}, 200
+
 
 @app.route('/feed', methods=['GET'])
 def get_app_feed():

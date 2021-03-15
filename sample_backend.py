@@ -137,27 +137,30 @@ def update_user_interests():
    # client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
    return {}
 
-@jwt_required
 @app.route('/like', methods=["POST"])
-def like_article(articleId):
+@jwt_required()
+def like_article():
    """ Add/Delete like to article and user """
+   user = get_jwt_identity()
    data = request.get_json()
    if data['action']=='add':
-      database_client.push_new_like(userId,articleId,articleId)
+      database_client.push_new_like(user['user_id'],data['article_id'],)
    if data['action']=='delete':
-      database_client.delete_like(data['user_id'],data['article_id'])
-   return 200
+      database_client.delete_like(user['user_id'],data['article_id'])
+   return {'msg':'liked article'},200
 
 
 
 
-@app.route('/comment')
+@app.route('/comment',methods=["POST"])
 @jwt_required()
-def comment(article_id):
+def comment():
    """ Add comment to user and article """
    data = request.get_json(force=True)
+   user = get_jwt_identity()
    if data['action']=='add':
-      database_client.push_comment(data['user_id'],data['article_id'],data['comment'])
+      database_client.push_new_comment(user['user_id'],data['article_id'],data['comment'])
+      return {'msg':'liked article'}, 200
 
 #inprogress
 # @app.route('/update_profile')

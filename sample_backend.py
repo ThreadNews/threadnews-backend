@@ -43,7 +43,7 @@ def feed_worker():
     return
 
 feed_process = multiprocessing.Process(target=feed_worker)
-# sentiment_process = multiprocessing.Process(target=sentiment_worker, args=(database_client,))
+# sentiment_process = multiprocessing.Process(target=sentiment_worker)
 feed_process.start()
 
 def exit_handler():

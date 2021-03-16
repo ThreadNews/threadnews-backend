@@ -82,6 +82,7 @@ class threadDatabase:
                 article['tags'] = {}
                 self.client.Articles.allArticles.insert_one(article)
                 i+=1
+        {'msg':'success'}
 
     def push_new_comment(self,user_name,article_id,comment):
         #add comment to user document(comment, article_id)

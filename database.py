@@ -15,8 +15,10 @@ class threadDatabase:
             logger.critical("user or password has not been changed!")
         else:
             logger.info("database has been successfully hooked up")
-            
+
+
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
+        
     def get_users(self):
         """ Retrieves users """
         logger.info("getting users")

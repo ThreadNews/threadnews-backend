@@ -19,6 +19,8 @@ class threadDatabase:
 
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
+
+        
     def get_users(self):
         """ Retrieves users """
         logger.info("getting users")
@@ -82,7 +84,7 @@ class threadDatabase:
                 article['global_score'] = 50
                 article["main_topic"] = ""
                 article['tags'] = {}
-                self.client.Articles.allArticles.insert_one(article)
+                # self.client.Articles.allArticles.insert_one(article)
                 i+=1
         {'msg':'success'}
 

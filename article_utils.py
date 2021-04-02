@@ -88,8 +88,7 @@ def get_article_text(url):
     words = list(map(lambda x: x.lower().replace(',','').strip(),words))
     text = ' '.join([word for word in words])
     return text
-
-def remove_stopwords(texts):
+\
     return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
 
 

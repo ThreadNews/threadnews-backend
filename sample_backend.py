@@ -7,7 +7,7 @@ import json
 import jsonify
 import uuid
 import hashlib
-from feed import NewsAPICalls
+from feed import NewsAPI
 # from pymongo import MongoClient
 # from db_templates import get_sentiment
 import logger
@@ -19,6 +19,8 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_apscheduler import APScheduler
+
 import bcrypt
 import multiprocessing
 import atexit
@@ -29,46 +31,34 @@ log = logger.setup_logger('root')
 configFile = threadConfiguration()
 log.debug('initalized logger')
 app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
-appFeed = NewsAPICalls(configFile.get_configuration())
 
+#NewsAPICalls(configFile.get_configuration()['NewsAPI']['key'].strip("\'"))
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
-
+scheduler = APScheduler()
 database_client = threadDatabase(configFile.get_configuration())
+appFeed = NewsAPI(configFile.get_configuration(), database_client)
 
+scheduler.api_enabled = True
+scheduler.init_app(app)
+
+@scheduler.task('interval', id='feed_collector', seconds=30)
 def feed_worker():
     # this is where the feed updator will be
-    appFeed = NewsAPICalls(configFile.get_configuration())
-    print("I'm the feed")
-    return
+   #  appFeed = NewsAPICalls(configFile.get_configuration())
+   log.info("collecting articles")
+   appFeed.begin()
 
-feed_process = multiprocessing.Process(target=feed_worker)
+scheduler.start()
+# feed_process = multiprocessing.Process(target=feed_worker)
 # sentiment_process = multiprocessing.Process(target=sentiment_worker)
-feed_process.start()
+# feed_process.start()
 
-def exit_handler():
-   feed_process.terminate()
+# def exit_handler():
+#    feed_process.terminate()
 
-atexit.register(exit_handler)
+# atexit.register(exit_handler)
 
-def feed_worker():
-    # this is where the feed updator will be
-    appFeed = NewsAPICalls(configFile.get_configuration())
-    print("I'm the feed")
-    return
-
-feed_process = multiprocessing.Process(target=feed_worker)
-# sentiment_process = multiprocessing.Process(target=sentiment_worker)
-feed_process.start()
-
-def exit_handler():
-   feed_process.terminate()
-
-atexit.register(exit_handler)
-
-sentiment_queue = []
-salt = open('salt.txt').readline()
-print("CURRENT SALT: ", salt)
 client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
@@ -236,7 +226,7 @@ def get_app_sources():
 
 @app.route('/headlines', methods=['GET'])
 def get_app_headlines():
-   """ Get headlines from NewsAPI and return itoh yea """
+   """ Get headlines from NewsAPI and return it"""
    if request.method == 'GET':
       return appFeed.get_headlines()
 
@@ -255,5 +245,6 @@ def get_articles():
       return database_client.get_articles(int(pages))
 
 
-
+if __name__ == "__main__":
+   app.run()
       

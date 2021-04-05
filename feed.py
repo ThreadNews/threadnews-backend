@@ -5,6 +5,7 @@ import json
 import os
 import logging 
 import sys
+from article import Article
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"
@@ -20,8 +21,8 @@ logger = logging.getLogger('root')
 class NewsAPICalls:
     """ Wrapper class for NewsAPI calls """
 
-    def __init__(self, configFile):
-        self.api_key = configFile['NewsAPI']['key'].strip("\'")
+    def __init__(self, api_key):
+        self.api_key = api_key
         if self.api_key == "YOURKEYHERE":
             logger.critical("missing api key, please add key to .config/api.conf")
         else:
@@ -81,3 +82,17 @@ class NewsAPICalls:
         if r.status_code != 200:
             return jsonify({"error": "internal error"}), 500
         return r.json()
+
+class NewsAPI:
+    def __init__(self, configFile, database):
+        self.db = database
+        self.api_key = configFile['NewsAPI']['key'].strip("\'")
+        self.feed = NewsAPICalls(self.api_key)
+
+    def begin(self):
+        """ current implementation makes use of hourly pull """
+        # todo: maybe based on the current time?
+
+        data = self.feed.get_headlines()["articles"]
+        formatted_articles = Article.convertToDataFrame(data)
+        self.db.push_new_articles(formatted_articles)

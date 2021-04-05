@@ -115,6 +115,17 @@ class threadDatabase:
         self.client.Articles.allArticles.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'article_id':article_id}}})
         return 200
 
+    def push_new_articles(self, articles):
+        inserted = 0
+        logger.info("trying to insert {} articles".format(len(articles)))
+        for article in articles:
+            if not self.client.Articles.allArticles.find({"id": article["id"]}):
+                self.client.Articles.allArticles.insert_one(article)
+                inserted += 1
+                
+        logger.info("inserted {} new articles".format(inserted))
+        return {"msg": "success"}, 200
+
     def push_new_like(self,user_id,article_id):
         #add like article doccument
         self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
@@ -123,11 +134,11 @@ class threadDatabase:
         return 200
 
     def delete_like(self,user_id,article_id):
-            #add like article doccument
-            self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
-            #add article id to user document
-            self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
-            return 200
+        #add like article doccument
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
+        #add article id to user document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
+        return 200
 
     def update_bio(self,user_id,bio):
         """ Updates user bio in user document """

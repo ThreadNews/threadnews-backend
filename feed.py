@@ -89,9 +89,9 @@ class NewsAPI:
         self.api_key = configFile['NewsAPI']['key'].strip("\'")
         self.feed = NewsAPICalls(self.api_key)
 
-    def begin(self):
+    def begin_collection(self):
         """ current implementation makes use of hourly pull """
-        # todo: maybe based on the current time?
+        # todo: add more items to add articles to the database
 
         data = self.feed.get_headlines()["articles"]
         formatted_articles = Article.convertToDataFrame(data)

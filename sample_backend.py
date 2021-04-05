@@ -42,12 +42,12 @@ appFeed = NewsAPI(configFile.get_configuration(), database_client)
 scheduler.api_enabled = True
 scheduler.init_app(app)
 
-@scheduler.task('interval', id='feed_collector', seconds=30)
+@scheduler.task('interval', id='feed_collector', seconds=3600)
 def feed_worker():
     # this is where the feed updator will be
    #  appFeed = NewsAPICalls(configFile.get_configuration())
    log.info("collecting articles")
-   appFeed.begin()
+   appFeed.begin_collection()
 
 scheduler.start()
 # feed_process = multiprocessing.Process(target=feed_worker)

@@ -1,4 +1,3 @@
-from os import unlink
 import uuid
 
 class Article:
@@ -20,5 +19,5 @@ class Article:
 
         if isinstance(article_data, list):
             return [convertor(article) for article in article_data]
-        return convertor(article_data)
+        return [convertor(article_data)]
         

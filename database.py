@@ -1,7 +1,5 @@
 from pymongo import MongoClient
 from bson import json_util
-import jsonify
-import pprint
 import uuid
 import json
 import logging
@@ -119,7 +117,7 @@ class threadDatabase:
         inserted = 0
         logger.info("trying to insert {} articles".format(len(articles)))
         for article in articles:
-            if not self.client.Articles.allArticles.find({"id": article["id"]}):
+            if self.client.Articles.allArticles.find({"id": article["id"]}).count() == 0:
                 self.client.Articles.allArticles.insert_one(article)
                 inserted += 1
                 

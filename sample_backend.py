@@ -6,10 +6,7 @@ import os
 import json
 import jsonify
 import uuid
-import hashlib
 from feed import NewsAPI
-# from pymongo import MongoClient
-# from db_templates import get_sentiment
 import logger
 from config import threadConfiguration
 from database import threadDatabase
@@ -22,8 +19,8 @@ from flask_jwt_extended import JWTManager
 from flask_apscheduler import APScheduler
 
 import bcrypt
-import multiprocessing
-import atexit
+
+POLL_INTERVAL = 3600 #seconds
 
 app = Flask(__name__)
 CORS(app)
@@ -42,7 +39,7 @@ appFeed = NewsAPI(configFile.get_configuration(), database_client)
 scheduler.api_enabled = True
 scheduler.init_app(app)
 
-@scheduler.task('interval', id='feed_collector', seconds=3600)
+@scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
     # this is where the feed updator will be
    #  appFeed = NewsAPICalls(configFile.get_configuration())
@@ -247,4 +244,3 @@ def get_articles():
 
 if __name__ == "__main__":
    app.run()
-      

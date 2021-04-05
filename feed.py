@@ -1,10 +1,6 @@
 from flask import jsonify
 import requests
-import configparser
-import json
-import os
-import logging 
-import sys
+import logging
 from article import Article
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"

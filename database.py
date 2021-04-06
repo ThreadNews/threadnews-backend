@@ -91,21 +91,6 @@ class threadDatabase:
         self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id,}})
         self.client.Articles.allArticles.update_one({'id':article_id},{'$dec':{'likes':1}})
 
-    def push_new_headlines(self,max=50):
-        feed = NewsAPICalls(self.config)
-        headlines = feed.get_headlines()
-        print(headlines.keys())
-        i=0
-        for article in headlines['articles']:
-            # print(article.get_json())
-            if i<max:
-                article['id'] = str(uuid.uuid4()).strip('-')
-                article['global_score'] = 50
-                article["main_topic"] = ""
-                article['tags'] = {}
-                self.client.Articles.allArticles.insert_one(article)
-                i+=1
-
     def push_new_comment(self,user_name,article_id,comment):
         #add comment to user document(comment, article_id)
         self.client.Users.users.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'user_name':user_name}}})
@@ -125,14 +110,14 @@ class threadDatabase:
         return {"msg": "success"}, 200
 
     def push_new_like(self,user_id,article_id):
-        #add like article doccument
+        #add like article document
         self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
         #add article id to user document
         self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
         return 200
 
     def delete_like(self,user_id,article_id):
-        #add like article doccument
+        #add like article document
         self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
         #add article id to user document
         self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})

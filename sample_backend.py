@@ -176,9 +176,9 @@ def like_article(articleId):
       data = request.get_json()
       current_user = get_jwt_identity()
       if data['action']=='add':
-         database_client.push_new_like(userId,articleId,articleId)
+         database_client.push_new_like(current_user['user_id'],articleId,articleId) # need to verify that this is being used properly
       if data['action']=='delete':
-         database_client.delete_like(data['user_id'],data['article_id'])
+         database_client.delete_like(current_user['user_id'],data['article_id']) # need to verify that this is being used properly
       return 200
 
 @app.route('/comment', methods=['POST'])

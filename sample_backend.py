@@ -41,20 +41,10 @@ scheduler.init_app(app)
 
 @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
-    # this is where the feed updator will be
-   #  appFeed = NewsAPICalls(configFile.get_configuration())
    log.info("collecting articles")
    appFeed.begin_collection()
 
 scheduler.start()
-# feed_process = multiprocessing.Process(target=feed_worker)
-# sentiment_process = multiprocessing.Process(target=sentiment_worker)
-# feed_process.start()
-
-# def exit_handler():
-#    feed_process.terminate()
-
-# atexit.register(exit_handler)
 
 client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
@@ -189,15 +179,6 @@ def comment(article_id):
    if data['action']=='add':
       database_client.push_comment(data['user_id'],data['article_id'],data['comment'])
 
-#inprogress
-# @app.route('/update_profile')
-# @jwt_required()
-# def update_bio():
-#    """ Add comment to user and article """
-#    data = request.get_json(force=True)['bio']
-#    user_id = get_jwt_identity()['user_name']
-#    database_client.update_bio(user_id,bio)
-
 @app.route('/feed', methods=['GET'])
 def get_app_feed():
    """ Get custom feed from NewsAPI and return it """
@@ -240,7 +221,6 @@ def get_articles():
       if pages is None:
          pages = 1
       return database_client.get_articles(int(pages))
-
 
 if __name__ == "__main__":
    app.run()

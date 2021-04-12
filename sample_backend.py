@@ -1,36 +1,23 @@
-from flask import Flask,Response
+
 from flask import request
 from flask import jsonify
-from flask_cors import CORS
+
 import os
 import json
 import jsonify
 import uuid
 import hashlib
-from feed import NewsAPICalls
+
 # from pymongo import MongoClient
 # from db_templates import get_sentiment
-import logger
-from config import threadConfiguration
-from database import threadDatabase
+
+
 from pymongo import MongoClient
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
-from flask_jwt_extended import JWTManager
 
 import bcrypt
-
-app = Flask(__name__)
-CORS(app)
-log = logger.setup_logger('root')
-configFile = threadConfiguration()
-log.debug('initalized logger')
-app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
-
-appFeed = NewsAPICalls(configFile.get_configuration())
-database_client = threadDatabase(configFile.get_configuration())
-jwt = JWTManager(app)
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -59,24 +46,7 @@ def get_interest_thread(interest,n):
       article_ls.append(article)
    return {'articles':article_ls}
 
-@app.route('/login',methods=["POST"])
-def try_login():
-   if request.method == 'POST':
-      data = request.get_json(force=True)
-      curr_user = database_client.get_user({"email": data.get("email")})
-      if len(curr_user) == 0:
-         return {"msg": "no user found"}, 404
-      
-      curr_user = curr_user[0]
-      if not bcrypt.checkpw(str.encode(data['password']), str.encode(curr_user['pass_hash'])):
-         return {"msg": "password don't match"}, 400
 
-      # clean up user data for less exposure
-      curr_user.pop('pass_hash', None)
-      curr_user.pop('_id', None)
-
-      access_token = create_access_token(identity=curr_user)
-      return {"access_token": access_token}, 200
    
 @app.route("/protected", methods=["GET"])
 @jwt_required()
@@ -85,52 +55,7 @@ def protected():
     current_user = get_jwt_identity()
     return {"logged_in_as": current_user}, 200
 
-@app.route('/newUser', methods=["POST"])
-def new_user():
-   if request.method == 'POST':
-      data = request.get_json(force = True)
-      username = None
-      email = None
-      password = None
 
-      if data:
-         if 'username' in data:
-            username = data['username']
-         else:
-            return {'msg': 'username not found'}, 406
-         
-         if 'email' in data:
-            email = data['email']
-         else:
-            return {'msg': 'email not found'}, 406
-
-         if 'password' in data:
-            password = data['password']
-         else:
-            return {'msg': 'password not found'}, 406
-
-      salt = bcrypt.gensalt()
-      pass_hash = bcrypt.hashpw(str.encode(password), salt)
-      user = {
-         "user_id": str(uuid.uuid1()),
-         "user_name": username,
-         "first_name": "",
-         "last_name": "",
-         "email": email,
-         "interests": [],
-         "pass_hash":pass_hash.decode(),
-      }
-      log.info("successfully parsed new user information")
-      result = database_client.add_user(user)
-
-      if result['result'] == -1:
-         return {"msg": result["msg"]}, 404
-
-      # clean up user data for less exposure
-      user.pop('_id', None)
-      user.pop('pass_hash', None)
-      access_token = create_access_token(identity=user)
-      return {"msg": "user successfully added", "access_token": access_token}, 200
 
 
 @app.route('/update_interests', methods=["POST"])

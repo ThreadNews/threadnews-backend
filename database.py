@@ -22,13 +22,15 @@ class threadDatabase:
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
         # self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
-        #self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
+        self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
     def get_article_by_id(self,article_id):
         articles = self.client.Articles.allArticles.find(
             {'id':article_id})
         for article in articles:
             return article
+
+    
         
     def get_users(self):
         """ Retrieves users """
@@ -213,7 +215,7 @@ class threadDatabase:
         return 200
 
     
-    def fetch_social(self,user_id,followers=False,following=False,counts=True):
+    def fetch_social(self,user_id,followers=False,following=False,counts=True,reposted=False):
         """gets user social information"""
 
         query = {'_id':0} #ignores id because causes issues parsing
@@ -223,6 +225,9 @@ class threadDatabase:
 
         if following: #fetch following
             query['following'] = 1
+
+        if reposted:
+            query['reposted']=1
 
         if counts: #fetch counts
             query['counts']=1
@@ -241,12 +246,24 @@ class threadDatabase:
         followers_following = []
         for user in socials['following']:
             following_user_socials = self.fetch_social(user,following=True, counts = True)
-
             followers_following.append(following_user_socials['result']['following'])
-        print("Original List : ",followers_following)
         ctr = collections.Counter(followers_following)
         ctr= dict(ctr)
         ctr_dict = dict(sorted(ctr.items(), key = itemgetter(1), reverse = True)[:N])
         return {'result':ctr_dict.keys()}
+
+
+    def fetch_friends_reposted_feed(self, user_id, N=20):
+        user_following = self.fetch_social(user_id,following=True)['result']['following']
+        feed =[]
+        for user in user_following:
+            user_reposted = self.fetch_social(user,reposted=True)['result']['reposted']
+            for article_id in user_reposted:
+                article = self.get_article_by_id(article_id)
+                feed.append(article)
+
+        #maybe sort by time posted 
+        return feed
+        
 
 

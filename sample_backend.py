@@ -6,10 +6,7 @@ import os
 import json
 import jsonify
 import uuid
-import hashlib
-from feed import NewsAPICalls
-# from pymongo import MongoClient
-# from db_templates import get_sentiment
+from feed import NewsAPI
 import logger
 from config import threadConfiguration
 from database import threadDatabase
@@ -19,7 +16,11 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_apscheduler import APScheduler
+
 import bcrypt
+
+POLL_INTERVAL = 3600 #seconds
 
 app = Flask(__name__)
 CORS(app)
@@ -28,9 +29,23 @@ configFile = threadConfiguration()
 log.debug('initalized logger')
 app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
 
-appFeed = NewsAPICalls(configFile.get_configuration())
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
+scheduler = APScheduler()
+database_client = threadDatabase(configFile.get_configuration())
+appFeed = NewsAPI(configFile.get_configuration(), database_client)
+
+scheduler.api_enabled = True
+scheduler.init_app(app)
+
+@scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
+def feed_worker():
+   log.info("collecting articles")
+   appFeed.begin_collection()
+
+scheduler.start()
+
+client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -150,9 +165,9 @@ def like_article(articleId):
       data = request.get_json()
       current_user = get_jwt_identity()
       if data['action']=='add':
-         database_client.push_new_like(userId,articleId,articleId)
+         database_client.push_new_like(current_user['user_id'],articleId,articleId) # need to verify that this is being used properly
       if data['action']=='delete':
-         database_client.delete_like(data['user_id'],data['article_id'])
+         database_client.delete_like(current_user['user_id'],data['article_id']) # need to verify that this is being used properly
       return 200
 
 @app.route('/comment', methods=['POST'])
@@ -162,15 +177,6 @@ def comment(article_id):
    data = request.get_json(force=True)
    if data['action']=='add':
       database_client.push_comment(data['user_id'],data['article_id'],data['comment'])
-
-#inprogress
-# @app.route('/update_profile')
-# @jwt_required()
-# def update_bio():
-#    """ Add comment to user and article """
-#    data = request.get_json(force=True)['bio']
-#    user_id = get_jwt_identity()['user_name']
-#    database_client.update_bio(user_id,bio)
 
 @app.route('/feed', methods=['GET'])
 def get_app_feed():
@@ -197,7 +203,7 @@ def get_app_sources():
 
 @app.route('/headlines', methods=['GET'])
 def get_app_headlines():
-   """ Get headlines from NewsAPI and return itoh yea """
+   """ Get headlines from NewsAPI and return it"""
    if request.method == 'GET':
       return appFeed.get_headlines()
 
@@ -215,6 +221,5 @@ def get_articles():
          pages = 1
       return database_client.get_articles(int(pages))
 
-
-
-      
+if __name__ == "__main__":
+   app.run()

@@ -6,10 +6,7 @@ import os
 import json
 import jsonify
 import uuid
-import hashlib
-from feed import NewsAPICalls
-# from pymongo import MongoClient
-# from db_templates import get_sentiment
+from feed import NewsAPI
 import logger
 from config import threadConfiguration
 from database import threadDatabase
@@ -19,7 +16,11 @@ from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 
+from flask_apscheduler import APScheduler
+
 import bcrypt
+
+POLL_INTERVAL = 3600 #seconds
 
 app = Flask(__name__)
 CORS(app)
@@ -27,9 +28,24 @@ log = logger.setup_logger('root')
 configFile = threadConfiguration()
 log.debug('initalized logger')
 app.config["JWT_SECRET_KEY"] = configFile.get_configuration()['JWT']['secret']
-appFeed = NewsAPICalls(configFile.get_configuration())
+
 database_client = threadDatabase(configFile.get_configuration())
 jwt = JWTManager(app)
+scheduler = APScheduler()
+database_client = threadDatabase(configFile.get_configuration())
+appFeed = NewsAPI(configFile.get_configuration(), database_client)
+
+scheduler.api_enabled = True
+scheduler.init_app(app)
+
+@scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
+def feed_worker():
+   log.info("collecting articles")
+   appFeed.begin_collection()
+
+scheduler.start()
+
+client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -48,13 +64,15 @@ def get_categoy_bubble_data():
 
 @app.route('/threads/<interest>/<n>', methods=["POST"])
 def get_interest_thread(interest,n):
+   #articles = database_client.get_articles(q={'main_topic': interest}, page=n)
    articles=database_client.client.Articles.allArticles.find()
+   print(articles)
+
    article_ls = []
    for article in articles:
       del article['_id']
       article_ls.append(article)
    return {'articles':article_ls}
-
 
 @app.route('/login',methods=["POST"])
 def try_login():
@@ -72,7 +90,7 @@ def try_login():
       curr_user.pop('pass_hash', None)
       curr_user.pop('_id', None)
 
-      access_token = create_access_token(identity=curr_user) # change if you want to use the difference
+      access_token = create_access_token(identity=curr_user)
       return {"access_token": access_token}, 200
    
 @app.route("/protected", methods=["GET"])
@@ -139,49 +157,27 @@ def new_user():
 @app.route('/update_interests', methods=["POST"])
 @jwt_required()
 def update_user_interests():
-   data = request.get_json(force=True)
-   user = get_jwt_identity()
-   status = database_client.add_interests(user['user_id'],data['new_interests'])
-   return status
+   if request.method == 'POST':
+      current_user = get_jwt_identity()
+      data = request.get_json(force=True) # new interest should be added as {"add": [new interest], "remove": [interest]}
+      database_client.update_user_interest(current_user['user_id'], data['add'], data['remove'])
+      return {"msg": "success"}, 200
+    
 
 @app.route('/like', methods=["POST"])
 @jwt_required()
-def like_article():
+def like_article(articleId):
    """ Add/Delete like to article and user """
-   user = get_jwt_identity()
-   data = request.get_json()
-   if data['action']=='add':
-      database_client.push_new_like(user['user_id'],data['article_id'],)
-   if data['action']=='delete':
-      database_client.delete_like(user['user_id'],data['article_id'])
-   return {'msg':'liked article'},200
+   if request.method == 'POST':
+      data = request.get_json()
+      current_user = get_jwt_identity()
+      if data['action']=='add':
+         database_client.push_new_like(current_user['user_id'],articleId,articleId) # need to verify that this is being used properly
+      if data['action']=='delete':
+         database_client.delete_like(current_user['user_id'],data['article_id']) # need to verify that this is being used properly
+      return 200
 
-
-
-@app.route('/save', methods=["POST"])
-def save_article():
-   """ Add/Delete user saved article """
-   result = {'msg':'',}
-   user = get_jwt_identity()
-   data = request.get_json()
-   if data['action']=='add':
-      result['msg'],status_code = database_client.push_new_save(user['user_id'],data['article_id'])
-   if data['action']=='delete':
-      result['msg'],status_code = database_client.push_new_save(user['user_id'],data['article_id'])
-   return result,status_code
-
-
-@app.route('/view', methods=["POST"])
-@jwt_required()
-def user_view_article():
-   result={}
-   user=get_jwt_identity()
-   data = request.get_json()
-   result['msg'],result['status'] = database_client.push_new_view(user['user_id'],data['article_id'])
-   return result
-
-
-@app.route('/comment',methods=["POST"])
+@app.route('/comment', methods=['POST'])
 @jwt_required()
 def comment():
    """ Add comment to user and article """
@@ -190,15 +186,6 @@ def comment():
    if data['action']=='add':
       database_client.push_new_comment(user['user_id'],data['article_id'],data['comment'])
       return {'msg':'liked article'}, 200
-
-#inprogress
-# @app.route('/update_profile')
-# @jwt_required()
-# def update_bio():
-#    """ Add comment to user and article """
-#    data = request.get_json(force=True)['bio']
-#    user_id = get_jwt_identity()['user_name']
-#    database_client.update_bio(user_id,bio)
 
 @app.route('/feed', methods=['GET'])
 @jwt_required()
@@ -226,7 +213,7 @@ def get_app_sources():
 
 @app.route('/headlines', methods=['GET'])
 def get_app_headlines():
-   """ Get headlines from NewsAPI and return itoh yea """
+   """ Get headlines from NewsAPI and return it"""
    if request.method == 'GET':
       return appFeed.get_headlines()
 
@@ -253,5 +240,5 @@ def get_articles():
          pages = 1
       return database_client.get_articles(int(pages))
 
-
-      
+if __name__ == "__main__":
+   app.run()

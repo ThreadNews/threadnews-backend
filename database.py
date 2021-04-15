@@ -1,7 +1,5 @@
 from pymongo import MongoClient
 from bson import json_util
-import jsonify
-import pprint
 import uuid
 import json
 import logging
@@ -23,6 +21,8 @@ class threadDatabase:
 
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
+        # self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
+        #self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
     def get_article_by_id(self,article_id):
         articles = self.client.Articles.allArticles.find(
@@ -66,10 +66,10 @@ class threadDatabase:
     def get_user_count(self):
         return self.client.Users.users.count
 
-    def get_articles(self, page=1):
+    def get_articles(self, q={}, page=1):
         """ Retrieves articles """
-        logger.info(f"getting articles: page number {page}")
-        payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find().skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
+        logger.info(f"getting articles {q}: page number {page}")
+        payload = json.loads(json.dumps(list(self.client.Articles.allArticles.find(q).skip((page-1)*_SIZE).limit((page-1)*_SIZE + _SIZE)), default=json_util.default))
         if len(payload) == 0:
             return {"message": "no articles possible"}, 404
 
@@ -89,6 +89,23 @@ class threadDatabase:
             logger.info("not possible to add user")
             return 500
 
+    def update_user_interest(self, user_id, add=None, remove=None):
+        if add:
+            self.client.Users.users.update_one({"user_id":user_id},
+                    {'$push':
+                        {'interests':
+                            { '$each': add }
+                        }
+                    })
+        
+        print(remove)
+        if remove:
+            self.client.Users.users.update_one({"user_id":user_id},
+                    {'$pull':
+                        { 'interests': 
+                            { '$in': remove }
+                        }
+                    })
 
     def push_new_headlines(self,max=50):
         feed = NewsAPICalls(self.config)
@@ -105,6 +122,14 @@ class threadDatabase:
                 # self.client.Articles.allArticles.insert_one(article)
                 i+=1
         {'msg':'success'}
+        
+    def add_likes_articles(self, user_id, article_id):
+        self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
+
+    def remove_likes_articles(self, user_id, article_id):
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id,}})
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$dec':{'likes':1}})
 
     def push_new_comment(self,user_name,article_id,comment):
         #add comment to user document(comment, article_id)
@@ -113,8 +138,19 @@ class threadDatabase:
         self.client.Articles.allArticles.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'article_id':article_id}}})
         return 200
 
+    def push_new_articles(self, articles):
+        inserted = 0
+        logger.info("trying to insert {} articles".format(len(articles)))
+        for article in articles:
+            if self.client.Articles.allArticles.find({"id": article["id"]}).count() == 0:
+                self.client.Articles.allArticles.insert_one(article)
+                inserted += 1
+                
+        logger.info("inserted {} new articles".format(inserted))
+        return {"msg": "success"}, 200
+
     def push_new_like(self,user_id,article_id):
-        #add like article doccument
+        #add like article document
         self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
         #add article id to user document
         self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
@@ -144,11 +180,11 @@ class threadDatabase:
 
 
     def delete_like(self,user_id,article_id):
-            #add like article doccument
-            self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
-            #add article id to user document
-            self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
-            return 200
+        #add like article document
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
+        #add article id to user document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
+        return 200
 
 
 

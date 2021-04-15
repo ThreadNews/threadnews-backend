@@ -6,6 +6,10 @@ import uuid
 import json
 import logging
 import certifi
+import time
+import collections
+from operator import itemgetter
+from feed import NewsAPICalls
 logger = logging.getLogger('root')
 _SIZE=20
 class threadDatabase:
@@ -20,6 +24,11 @@ class threadDatabase:
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
 
+    def get_article_by_id(self,article_id):
+        articles = self.client.Articles.allArticles.find(
+            {'id':article_id})
+        for article in articles:
+            return article
         
     def get_users(self):
         """ Retrieves users """
@@ -30,6 +39,15 @@ class threadDatabase:
         """ Retrieves users """
         logger.info("getting users")
         return json.loads(json.dumps(list(self.client.Users.users.find(q)), default=json_util.default))
+
+
+    def get_user_interests(self, q='',interests=True):
+        user = self.get_user(q)[0]
+        print("USER:",user)
+        if user['interests'] is not None and interests:
+            return {'interests':user['interests']}
+        return {'msg':'error'}
+
 
     def add_user(self, new_user=None):
         logger.info("trying to add new user")
@@ -102,6 +120,29 @@ class threadDatabase:
         self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
         return 200
 
+
+    def push_new_view(self,user_id,article_id):
+        #stores article id, headline, sentiment in user object
+        article_data = self.get_article_by_id(article_id)
+        article_data['date'] = time.time()
+        self.client.Users.users.update_one({'user_id':user_id},{'$push':{'viewed_articles':article_data}})
+        return 200,"success"
+
+
+    def push_new_save(self,user_id,article_id):
+        #add save to user doccument
+        self.client.Users.users.update_one({"user_id":user_id},{'$push':{'saved_articles': article_id,}})
+        #add save count to article document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'saves':1}})
+        return 'success',200
+
+    def delete_save(self,user_id,article_id):
+        #add save to user doccument
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'saved_articles': article_id,}})
+        #add save count to article document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'saves':-1}})
+
+
     def delete_like(self,user_id,article_id):
             #add like article doccument
             self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
@@ -109,7 +150,67 @@ class threadDatabase:
             self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
             return 200
 
+
+
+    def update_interests(self, user_id, interests, remove=False):
+        op = '$push' if not remove else '$pull'
+        for interest in interests:
+            self.client.Users.users.update_one({'user_id':user_id,},{op:{'interests':interest}})
+        return 200
+
+
     def update_bio(self,user_id,bio):
         """ Updates user bio in user document """
         self.client.User.users.update_one({'user_id':user_id},{'$set':{'bio':bio}})
         return 200
+
+    def follow_user(self,user_id1,user_id2,unfollow=False):
+        """user 1 follows or unfollows user 2"""
+        op = '$pull' if unfollow else '$addToSet'
+        self.client.Users.users.update_one({'user_id':user_id1},{op:{'following':user_id2}})
+        self.client.Users.users.update_one({'user_id':user_id2},{op:{'followers':user_id1}})
+
+        #incriment of decrement follower count / following count
+        i = -1 if unfollow else 1
+        self.client.User.users.update_one({'user_id':user_id2},{'$inc':{'following_count':i}})
+        self.client.User.users.update_one({'user_id':user_id2},{'$inc':{'followers_count':i}})
+        return 200
+
+    
+    def fetch_social(self,user_id,followers=False,following=False,counts=True):
+        """gets user social information"""
+
+        query = {'_id':0} #ignores id because causes issues parsing
+        
+        if followers: #fetch followers
+            query['followers']=1
+
+        if following: #fetch following
+            query['following'] = 1
+
+        if counts: #fetch counts
+            query['counts']=1
+
+        cursor = self.client.Users.users.find({'user_id':user_id},query)
+        for user in cursor:    
+            print("social info - user:"+ user_id, user)
+            
+            return {'result':user,'msg':'Success'}
+        return {'result':{},'msg':'unable to fetch'}
+                
+
+    def fetch_reccomended_social(self,user_id, following = False, articles=False, N=10):
+        """creates list of reccomentdations for user to follow"""
+        socials = self.fetch_social(user_id,following=True, counts = True)['result']
+        followers_following = []
+        for user in socials['following']:
+            following_user_socials = self.fetch_social(user,following=True, counts = True)
+
+            followers_following.append(following_user_socials['result']['following'])
+        print("Original List : ",followers_following)
+        ctr = collections.Counter(followers_following)
+        ctr= dict(ctr)
+        ctr_dict = dict(sorted(ctr.items(), key = itemgetter(1), reverse = True)[:N])
+        return {'result':ctr_dict.keys()}
+
+

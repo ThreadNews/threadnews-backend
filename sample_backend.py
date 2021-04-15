@@ -116,6 +116,12 @@ def new_user():
          "email": email,
          "interests": [],
          "pass_hash":pass_hash.decode(),
+         "following":[],
+         "followers":[],
+         "liked_articles":[],
+         "not_for_me_articles":"",
+         'suggested_follows':"",
+         'suggest_articles': ""
       }
       log.info("successfully parsed new user information")
       result = database_client.add_user(user)
@@ -131,11 +137,12 @@ def new_user():
 
 
 @app.route('/update_interests', methods=["POST"])
+@jwt_required()
 def update_user_interests():
    data = request.get_json(force=True)
-   print(type(data))
-   # client.Users.users.update_one({"user_id":data['user_id']},{'$set':{'interests':data['new_interests']}})
-   return {}
+   user = get_jwt_identity()
+   status = database_client.add_interests(user['user_id'],data['new_interests'])
+   return status
 
 @app.route('/like', methods=["POST"])
 @jwt_required()
@@ -150,6 +157,28 @@ def like_article():
    return {'msg':'liked article'},200
 
 
+
+@app.route('/save', methods=["POST"])
+def save_article():
+   """ Add/Delete user saved article """
+   result = {'msg':'',}
+   user = get_jwt_identity()
+   data = request.get_json()
+   if data['action']=='add':
+      result['msg'],status_code = database_client.push_new_save(user['user_id'],data['article_id'])
+   if data['action']=='delete':
+      result['msg'],status_code = database_client.push_new_save(user['user_id'],data['article_id'])
+   return result,status_code
+
+
+@app.route('/view', methods=["POST"])
+@jwt_required()
+def user_view_article():
+   result={}
+   user=get_jwt_identity()
+   data = request.get_json()
+   result['msg'],result['status'] = database_client.push_new_view(user['user_id'],data['article_id'])
+   return result
 
 
 @app.route('/comment',methods=["POST"])
@@ -172,6 +201,7 @@ def comment():
 #    database_client.update_bio(user_id,bio)
 
 @app.route('/feed', methods=['GET'])
+@jwt_required()
 def get_app_feed():
    """ Get custom feed from NewsAPI and return it """
    if request.method == 'GET':
@@ -206,6 +236,15 @@ def get_users():
    if request.method == 'GET':
       return jsonify(database_client.get_users()), 200
 
+@app.route('/interests', methods=['POST'])
+@jwt_required()
+def get_user_interests():
+   """gets list of user interests"""
+   if request.method=='POST':
+      user=get_jwt_identity()
+      data = request.get_json()
+      return (database_client.get_user_interests(q={'user_id':user['user_id']})),200
+
 @app.route('/articles', methods=['GET'])
 def get_articles():
    if request.method == 'GET':
@@ -213,7 +252,6 @@ def get_articles():
       if pages is None:
          pages = 1
       return database_client.get_articles(int(pages))
-
 
 
       

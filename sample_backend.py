@@ -45,7 +45,6 @@ def feed_worker():
 
 scheduler.start()
 
-client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():

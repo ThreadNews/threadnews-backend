@@ -21,14 +21,17 @@ class threadDatabase:
 
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
-        self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
-        
+        # self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
+        self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
     def get_article_by_id(self,article_id):
         articles = self.client.Articles.allArticles.find(
             {'id':article_id})
         for article in articles:
             return article
+
+    def get_user_list(user_ls):
+        return get_users(q={'user_id':{'$in': user_ls}})
 
     
         

@@ -10,6 +10,7 @@ from operator import itemgetter
 from feed import NewsAPICalls
 logger = logging.getLogger('root')
 _SIZE=20
+
 class threadDatabase:
     def __init__(self, config):
         database, user, password = config['MongoDB']['URl'], config['MongoDB']['user'], config['MongoDB']['password']
@@ -21,8 +22,7 @@ class threadDatabase:
 
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
-        # self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
-        self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
+        
 
     def get_article_by_id(self,article_id):
         articles = self.client.Articles.allArticles.find(
@@ -31,7 +31,7 @@ class threadDatabase:
             return article
 
     def get_user_list(user_ls):
-        return get_users(q={'user_id':{'$in': user_ls}})
+            return get_users(q={'user_id':{'$in': user_ls}})
 
     
         

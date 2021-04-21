@@ -1,6 +1,7 @@
 from flask import request, Blueprint
 from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import jsonify
 
 user_blueprint = Blueprint("user_blueprint", __name__)
 
@@ -17,3 +18,37 @@ def update_user_interests():
             current_user["user_id"], data["add"], data["remove"]
         )
         return {"msg": "success"}, 200
+
+
+@user_blueprint.route('/users', methods=['GET'])
+def get_users():
+   """ Get the users of ThreadNews """
+   if request.method == 'GET':
+      return jsonify(database_client.get_users()), 200
+
+
+@user_blueprint.route('/follow_user', methods = ["POST"])
+@jwt_required()
+def follow_user():
+    """User that is signed in will follow/unfollow other user"""
+    current_user = get_jwt_identity()
+    data = request.get_json(force=True)
+    follow = True if data['action']=="follow" else False
+    database_client.follow_user(current_user['user_id'],data['user_id'],data['action'])
+
+
+@user_blueprint.route('/reccomended_follows',methods=["POST"])
+@jwt_required()
+def get_reccomended_follows():
+    """returns a list of users the user may like to follow"""
+    current_user = get_jwt_identity()
+    data = request.get_json(force=True)
+    following = True if 'following' in current_user.keys() else False
+    if following:
+        reccomended_users = database_client.fetch_reccomended_social(current_user['user_id'],N=data['N'])
+        return {'reccomended_users':'hey'},200
+        
+        #return reccomended_users,200
+    return {"msg":'error no users found'},404
+
+

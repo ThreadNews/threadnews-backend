@@ -19,10 +19,10 @@ class threadDatabase:
         else:
             logger.info("database has been successfully hooked up")
         self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
-        # self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
+        self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 
-        self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
+        #self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         
         
 
@@ -138,11 +138,12 @@ class threadDatabase:
         self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id,}})
         self.client.Articles.allArticles.update_one({'id':article_id},{'$dec':{'likes':1}})
 
-    def push_new_comment(self,user_name,article_id,comment):
+    def push_new_comment(self,user_name,article_id,comment, add=True):
         #add comment to user document(comment, article_id)
-        self.client.Users.users.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'user_name':user_name}}})
+        op = '$push' if add else '$pull'
+        self.client.Users.users.update_one({"id":article_id},{op:{'comments': {'comment':comment,'user_name':user_name}}})
         #add comment to article document(comment,user_name)
-        self.client.Articles.allArticles.update_one({"id":article_id},{'$push':{'comments': {'comment':comment,'article_id':article_id}}})
+        self.client.Articles.allArticles.update_one({"id":article_id},{op:{'comments': {'comment':comment,'article_id':article_id}}})
         return 200
 
     def push_new_articles(self, articles):
@@ -240,7 +241,6 @@ class threadDatabase:
         cursor = self.client.Users.users.find({'user_id':user_id},query)
         for user in cursor:    
             print("social info - user:"+ user_id, user)
-            
             return {'result':user,'msg':'Success'}
         return {'result':{},'msg':'unable to fetch'}
                 
@@ -255,7 +255,8 @@ class threadDatabase:
         ctr = collections.Counter(followers_following)
         ctr= dict(ctr)
         ctr_dict = dict(sorted(ctr.items(), key = itemgetter(1), reverse = True)[:N])
-        return {'result':ctr_dict.keys()}
+        logger.info("username already in use",ctr_dict)
+        return {'result':list(ctr_dict.keys())}
 
 
     def fetch_friends_reposted_feed(self, user_id, N=20):
@@ -269,6 +270,3 @@ class threadDatabase:
 
         #maybe sort by time posted 
         return feed
-        
-
-

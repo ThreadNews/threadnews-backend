@@ -24,10 +24,12 @@ def like_article(articleId):
 def comment(article_id):
     """ Add comment to user and article """
     data = request.get_json(force=True)
-    if data["action"] == "add":
-        database_client.push_comment(
-            data["user_id"], data["article_id"], data["comment"]
-        )
+    user = get_jwt_identity()
+    if data['action']=='add':
+        database_client.push_new_comment(user['user_id'],data['article_id'],data['comment'])
+        return {'msg':'liked article'}, 200
+    return {''}
+
 
 
 @article_blueprint.route("/threads/<interest>/<n>", methods=["POST"])

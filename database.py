@@ -141,9 +141,9 @@ class threadDatabase:
     def push_new_comment(self,user_name,article_id,comment, add=True):
         #add comment to user document(comment, article_id)
         op = '$push' if add else '$pull'
-        self.client.Users.users.update_one({"id":article_id},{op:{'comments': {'comment':comment,'user_name':user_name}}})
+        # self.client.Users.users.update_one({"user_id":user_id},{op:{'comments': {'comment':comment,'article_id':article_id}}})
         #add comment to article document(comment,user_name)
-        self.client.Articles.allArticles.update_one({"id":article_id},{op:{'comments': {'comment':comment,'article_id':article_id}}})
+        self.client.Articles.allArticles.update_one({"id":article_id},{op:{'comments': {'comment':comment,'user_name':user_name}}})
         return 200
 
     def push_new_articles(self, articles):

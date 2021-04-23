@@ -7,6 +7,6 @@ def feed_worker():
    log.info("collecting articles")
    appFeed.begin_collection()
 
-@scheduler.task('interval', id='test', seconds=5)
-def test1():
-   print("test 1")
+# @scheduler.task('interval', id='test', seconds=5)
+# def test1():
+#    print("test 1")

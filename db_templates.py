@@ -18,6 +18,8 @@ def user_template(username='',first_name='',last_name='',email='',interests=[]):
         "last_name": last_name,
         "email": email,
         "interests": interests,
+        "following":[],
+        "followers":[],
     }
     return user
 

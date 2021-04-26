@@ -3,6 +3,7 @@ import bcrypt
 from flask_jwt_extended import create_access_token
 from backend_vars import database_client, log
 import uuid
+import db_templates
 
 login_blueprint = Blueprint('login_blueprint', __name__)
 
@@ -53,15 +54,10 @@ def new_user():
 
         salt = bcrypt.gensalt()
         pass_hash = bcrypt.hashpw(str.encode(password), salt)
-        user = {
-            "user_id": str(uuid.uuid1()),
-            "user_name": username,
-            "first_name": "",
-            "last_name": "",
-            "email": email,
-            "interests": [],
-            "pass_hash":pass_hash.decode(),
-        }
+        user = db_templates.user_template(username=username, email=email)
+        user["user_id"]= str(uuid.uuid1()),            
+        user["pass_hash"]= pass_hash.decode()
+        
         log.info("successfully parsed new user information")
         result = database_client.add_user(user)
 

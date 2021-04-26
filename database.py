@@ -32,8 +32,8 @@ class threadDatabase:
         for article in articles:
             return article
 
-    def get_user_list(user_ls):
-            return get_users(q={'user_id':{'$in': user_ls}})
+    def get_user_list(self,user_ls):
+            return self.get_user(q={'user_id':{'$in': user_ls}})
 
     
         
@@ -210,7 +210,7 @@ class threadDatabase:
 
     def follow_user(self,user_id1,user_id2,unfollow=False):
         """user 1 follows or unfollows user 2"""
-        op = '$pull' if unfollow else '$addToSet'
+        op = '$pull' if unfollow else '$push'
         self.client.Users.users.update_one({'user_id':user_id1},{op:{'following':user_id2}})
         self.client.Users.users.update_one({'user_id':user_id2},{op:{'followers':user_id1}})
 
@@ -249,13 +249,19 @@ class threadDatabase:
         """creates list of reccomentdations for user to follow"""
         socials = self.fetch_social(user_id,following=True, counts = True)['result']
         followers_following = []
+        
         for user in socials['following']:
-            following_user_socials = self.fetch_social(user,following=True, counts = True)
-            followers_following.append(following_user_socials['result']['following'])
+            try:
+                following_user_socials = self.fetch_social(user,following=True, counts = True)
+                for user in following_user_socials['result']['following']:
+                    followers_following.append(user)
+            
+            except Exception as e:
+                print("exception",e)
         ctr = collections.Counter(followers_following)
         ctr= dict(ctr)
         ctr_dict = dict(sorted(ctr.items(), key = itemgetter(1), reverse = True)[:N])
-        logger.info("username already in use",ctr_dict)
+        
         return {'result':list(ctr_dict.keys())}
 
 

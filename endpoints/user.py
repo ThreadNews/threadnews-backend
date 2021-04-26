@@ -33,8 +33,11 @@ def follow_user():
     """User that is signed in will follow/unfollow other user"""
     current_user = get_jwt_identity()
     data = request.get_json(force=True)
-    follow = True if data['action']=="follow" else False
-    database_client.follow_user(current_user['user_id'],data['user_id'],data['action'])
+    unfollow = False if data['action']=="follow" else True
+    status = database_client.follow_user(current_user['user_id'],data['user_id'],unfollow)
+    if status==200:
+        return {'result':"success"},200
+    return {'result':"err"},430
 
 
 @user_blueprint.route('/reccomended_follows',methods=["POST"])
@@ -42,13 +45,16 @@ def follow_user():
 def get_reccomended_follows():
     """returns a list of users the user may like to follow"""
     current_user = get_jwt_identity()
+    print(current_user)
     data = request.get_json(force=True)
-    following = True if 'following' in current_user.keys() else False
-    if following:
-        reccomended_users = database_client.fetch_reccomended_social(current_user['user_id'],N=data['N'])
-        return {'reccomended_users':'hey'},200
+    users = database_client.get_user_list(current_user['suggested_follows'])
+    return {'result':users}
+    # following = True if 'following' in current_user.keys() else False
+    # if following:
+    #     reccomended_users = database_client.fetch_reccomended_social(current_user['user_id'],N=data['N'])
+    #     return {'reccomended_users':'hey'},200
         
         #return reccomended_users,200
-    return {"msg":'error no users found'},404
+    return {"msg":'error no users found'},407
 
 

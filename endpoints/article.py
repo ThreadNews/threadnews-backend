@@ -4,6 +4,15 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 article_blueprint = Blueprint("article_blueprint", __name__)
 
+@article_blueprint.route("/articles", methods=["POST"])
+def article_list():
+    if request.method=="POST":
+        data = request.get_json()
+        articles =database_client.get_article_list(data['article_ids'])
+        print(articles)
+        return {'result':articles},200
+    return 404
+
 
 @article_blueprint.route("/like", methods=["POST"])
 @jwt_required()

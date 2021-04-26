@@ -7,7 +7,7 @@ import certifi
 import time
 import collections
 from operator import itemgetter
-from feed import NewsAPICalls
+from utils.feed import NewsAPICalls
 logger = logging.getLogger('root')
 _SIZE=20
 
@@ -196,12 +196,23 @@ class threadDatabase:
         return 200
 
 
+    def get_article_list(self,article_ids, n=10):
+        article_ls=[]
+        cur = self.client.Articles.allArticles.find({'id':{'$in':article_ids}})
+        for article in cur:
+            del article['_id']
+            print('addd')
+            article_ls.append(article)
+
+        return article_ls
 
     def update_interests(self, user_id, interests, remove=False):
         op = '$push' if not remove else '$pull'
         for interest in interests:
             self.client.Users.users.update_one({'user_id':user_id,},{op:{'interests':interest}})
         return 200
+
+    
 
 
     def update_bio(self, user_id, bio="",first_name="",last_name="", profile_pic="", new_password="", new_email=""):

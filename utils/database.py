@@ -8,6 +8,7 @@ import logging
 import certifi
 logger = logging.getLogger('root')
 _SIZE=20
+
 class threadDatabase:
     def __init__(self, config):
         database, user, password = config['MongoDB']['URl'], config['MongoDB']['user'], config['MongoDB']['password']
@@ -130,7 +131,28 @@ class threadDatabase:
             self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
             return 200
 
-    def update_bio(self,user_id,bio):
+
+    def update_bio(self, user_id, bio="",first_name="",last_name="", profile_pic="", new_password="", new_email=""):
         """ Updates user bio in user document """
-        self.client.User.users.update_one({'user_id':user_id},{'$set':{'bio':bio}})
-        return 200
+        new_info = {}
+
+        if bio:
+            new_info["bio"] = bio
+        if first_name:
+            new_info["first_name"] = first_name
+        if last_name: 
+            new_info["last_name"] = last_name
+        if profile_pic: 
+            new_info["profile_pic"] = profile_pic
+        if new_password: 
+            new_info["new_password"] = new_password
+        if new_email: 
+            new_info["new_email"] = new_email
+
+        self.client.User.users.update_one({'user_id':user_id},{'$set':new_info})
+        return new_info
+
+
+
+
+

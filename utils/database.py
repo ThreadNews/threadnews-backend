@@ -125,11 +125,11 @@ class threadDatabase:
         return 200
 
     def delete_like(self,user_id,article_id):
-            #add like article doccument
-            self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
-            #add article id to user document
-            self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
-            return 200
+        #add like article doccument
+        self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id}})
+        #add article id to user document
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':-1}})
+        return 200
 
 
     def update_bio(self, user_id, bio="",first_name="",last_name="", profile_pic="", new_password="", new_email=""):

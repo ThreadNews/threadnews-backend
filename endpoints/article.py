@@ -38,7 +38,24 @@ def comment():
         database_client.push_new_comment(user['user_name'],data['article_id'],data['comment'])
         return {'msg':'liked article'}, 200
     elif data['action']=='remove':
-        database_client.push_new_comment(user['user_name'],data['article_id'],data['comment'],add=True)
+        database_client.push_new_comment(user['user_name'],data['article_id'],data['comment'],add=False)
+        return {'msg':'liked article'}, 200
+    return {''}
+
+
+
+
+@article_blueprint.route("/repost", methods=["POST"])
+@jwt_required()
+def repost():
+    """ Add comment to user and article """
+    data = request.get_json(force=True)
+    user = get_jwt_identity()
+    if data['action']=='add':
+        database_client.repost_article(user['user_name'],data['article_id'])
+        return {'msg':'liked article'}, 200
+    elif data['action']=='remove':
+        database_client.repost_article(user['user_name'],data['article_id'],add=True)
         return {'msg':'liked article'}, 200
     return {''}
 

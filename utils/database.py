@@ -8,6 +8,7 @@ import time
 import collections
 from operator import itemgetter
 from utils.feed import NewsAPICalls
+import random
 logger = logging.getLogger('root')
 _SIZE=20
 
@@ -18,12 +19,9 @@ class threadDatabase:
             logger.critical("user or password has not been changed!")
         else:
             logger.info("database has been successfully hooked up")
-        self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
+        # self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
         self.client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
-
-        #self.client = MongoClient(database.format(user, password), tlsCAFile=certifi.where())
-        
         
 
     def get_article_by_id(self,article_id):
@@ -72,6 +70,14 @@ class threadDatabase:
 
     def get_user_count(self):
         return self.client.Users.users.count
+
+    def get_random_article(self):
+        """Gets random article (used for test users)"""
+        article = dict(self.client.Articles.allArticles.find().limit(-1).skip(int(random.randint(0,50))).next())
+        del article['_id']
+        
+        return article
+
 
     def get_articles(self, q={}, page=1):
         """ Retrieves articles """
@@ -133,6 +139,13 @@ class threadDatabase:
     def add_likes_articles(self, user_id, article_id):
         self.client.Users.users.update_one({"user_id":user_id},{'$push':{'liked_articles': article_id,}})
         self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'likes':1}})
+    
+    def repost_article(self, user_id, article_id, add= True):
+        op = '$push' if not add else '$pull'
+        self.client.Users.users.update_one({"user_id":user_id},{op:{'reposted_articles': article_id,}})
+        self.client.Articles.allArticles.update_one({'id':article_id},{'$inc':{'reposts':1}})
+
+
 
     def remove_likes_articles(self, user_id, article_id):
         self.client.Users.users.update_one({"user_id":user_id},{'$pull':{'liked_articles': article_id,}})
@@ -288,8 +301,10 @@ class threadDatabase:
 
         #maybe sort by time posted 
         return feed
+        
+    def update_user(self, user_id, bio="",first_name="",last_name="", profile_pic="", new_password="", new_email=""):
+        """ Updates user bio in user document """
         new_info = {}
-
         if bio:
             new_info["bio"] = bio
         if first_name:
@@ -302,11 +317,8 @@ class threadDatabase:
             new_info["new_password"] = new_password
         if new_email: 
             new_info["new_email"] = new_email
-
-        self.client.User.users.update_one({'user_id':user_id},{'$set':new_info})
+            
+        self.client.Users.users.update_one({'user_id':user_id},{'$set':new_info},upsert=True)
         return new_info
-
-
-
 
 

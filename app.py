@@ -8,6 +8,7 @@ from endpoints.article import article_blueprint
 from endpoints.tests import test_blueprint
 from endpoints.user import user_blueprint
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -19,11 +20,10 @@ def create_app():
     app.register_blueprint(test_blueprint) # for testing
     app.register_blueprint(user_blueprint)
     jwt = JWTManager(app)
-
+    from endpoints import tasks
     scheduler.api_enabled = True
     scheduler.init_app(app)
-    
-    from endpoints import tasks
+
     scheduler.start()
 
     return app

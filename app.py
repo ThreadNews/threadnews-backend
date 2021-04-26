@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from backend_vars import configFile
+from backend_vars import configFile, scheduler
 from endpoints.login import login_blueprint
 from endpoints.frontend import front_blueprint
 from endpoints.article import article_blueprint
@@ -18,7 +18,12 @@ def create_app():
     app.register_blueprint(article_blueprint)
     app.register_blueprint(test_blueprint) # for testing
     app.register_blueprint(user_blueprint)
-    jwt = JWTManager()
-    jwt.init_app(app)
+    jwt = JWTManager(app)
+
+    scheduler.api_enabled = True
+    scheduler.init_app(app)
+    
+    from endpoints import tasks
+    scheduler.start()
 
     return app

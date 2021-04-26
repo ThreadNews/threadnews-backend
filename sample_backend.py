@@ -15,7 +15,6 @@ from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
-
 from flask_apscheduler import APScheduler
 
 import bcrypt
@@ -45,6 +44,7 @@ def feed_worker():
 
 scheduler.start()
 
+client = MongoClient("mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net")
 
 @app.route('/categoryBubbleData',methods = ['GET',"POST"])
 def get_categoy_bubble_data():
@@ -240,4 +240,5 @@ def get_articles():
       return database_client.get_articles(int(pages))
 
 if __name__ == "__main__":
+   app.run()
    app.run()

@@ -1,1 +1,1 @@
-restful: ./run.sh app.py --no-reload
+web: ./run.sh app.py --no-reload

@@ -1,5 +1,5 @@
 from flask import request, Blueprint, jsonify
-from backend_vars import database_client, appFeed
+from backend_vars import database_client, appFeed, log
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 test_blueprint = Blueprint('test_blueprint', __name__)
@@ -19,19 +19,20 @@ def get_app_feed():
         sort_by = request.args.get("sortBy")
         page_size = request.args.get("pageSize")
         page = request.args.get("page")
-        return appFeed.get_feed(q=q, q_in_title=q_in_title, sources=sources, domains=domains, exclude_domains=exclude_domains, date_from=date_from, date_to=date_to, lang=lang, sort_by=sort_by, page_size=page_size, page=page)
+        return appFeed.feed.get_feed(q=q, q_in_title=q_in_title, sources=sources, domains=domains, exclude_domains=exclude_domains, date_from=date_from, date_to=date_to, lang=lang, sort_by=sort_by, page_size=page_size, page=page)
 
 @test_blueprint.route('/sources', methods=['GET'])
 def get_app_sources():
     """ Get sources from NewsAPI and return it """
+    log.info("trying to retrieve sources")
     if request.method == 'GET':
-        return appFeed.get_sources()
+        return appFeed.feed.get_sources()
 
 @test_blueprint.route('/headlines', methods=['GET'])
 def get_app_headlines():
     """ Get headlines from NewsAPI and return itoh yea """
     if request.method == 'GET':
-        return appFeed.get_headlines()
+        return appFeed.feed.get_headlines()
 
 @test_blueprint.route('/users', methods=['GET'])
 def get_users():

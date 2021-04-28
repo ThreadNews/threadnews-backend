@@ -1,1 +1,1 @@
-web: ./run.sh app.py --no-reload
+web: gunicorn backend:app

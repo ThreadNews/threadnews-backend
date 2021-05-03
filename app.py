@@ -21,7 +21,6 @@ def create_app():
     jwt = JWTManager(app)
 
     scheduler.api_enabled = True
-    scheduler.init_app(app)
     
     from endpoints import tasks
     scheduler.start()

@@ -1,7 +1,12 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from backend_vars import configFile, scheduler
+
+import atexit
+
+from endpoints import tasks
+
+from backend_vars import configFile, scheduler, log
 from endpoints.login import login_blueprint
 from endpoints.frontend import front_blueprint
 from endpoints.article import article_blueprint
@@ -21,8 +26,10 @@ def create_app():
     jwt = JWTManager(app)
 
     scheduler.api_enabled = True
-    
-    from endpoints import tasks
+    scheduler.add_job(func = tasks.feed_worker, trigger = 'interval', seconds = 3600)
     scheduler.start()
+    log.info("scheduler started")
+
+    atexit.register(lambda: scheduler.shutdown())
 
     return app

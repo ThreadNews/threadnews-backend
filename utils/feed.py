@@ -1,7 +1,7 @@
 from flask import jsonify
 import requests
 import logging
-from article import Article
+from .article import Article
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"

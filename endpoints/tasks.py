@@ -1,8 +1,8 @@
 from backend_vars import scheduler, log, appFeed
 
-POLL_INTERVAL = 3600 #seconds
+POLL_INTERVAL = 3600  # seconds
 
 # @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
-   log.info("collecting articles")
-   appFeed.begin_collection()
+    log.info("collecting articles")
+    appFeed.begin_collection()

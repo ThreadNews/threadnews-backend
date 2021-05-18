@@ -187,7 +187,16 @@ class threadDatabase:
         )
         return 200
 
-    def update_bio(self, user_id, bio="",first_name="",last_name="", profile_pic="", new_password="", new_email=""):
+    def update_bio(
+        self,
+        user_id,
+        bio="",
+        first_name="",
+        last_name="",
+        profile_pic="",
+        new_password="",
+        new_email="",
+    ):
         """ Updates user bio in user document """
         new_info = {}
 
@@ -195,14 +204,14 @@ class threadDatabase:
             new_info["bio"] = bio
         if first_name:
             new_info["first_name"] = first_name
-        if last_name: 
+        if last_name:
             new_info["last_name"] = last_name
-        if profile_pic: 
+        if profile_pic:
             new_info["profile_pic"] = profile_pic
-        if new_password: 
+        if new_password:
             new_info["new_password"] = new_password
-        if new_email: 
+        if new_email:
             new_info["new_email"] = new_email
 
-        self.client.User.users.update_one({'user_id':user_id},{'$set':new_info})
+        self.client.User.users.update_one({"user_id": user_id}, {"$set": new_info})
         return new_info

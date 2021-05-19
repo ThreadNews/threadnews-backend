@@ -31,9 +31,9 @@ class threadDatabase:
             return article
 
     def get_user_list(self,user_ls):
+            if type(user_ls)==dict:
+                user_ls = list(user_ls.values())
             return self.get_user(q={'user_id':{'$in': user_ls}})
-
-    
         
     def get_users(self):
         """ Retrieves users """
@@ -46,6 +46,35 @@ class threadDatabase:
         return json.loads(json.dumps(list(self.client.Users.users.find(q)), default=json_util.default))
 
 
+    def search_user(self, search_string): 
+        q = {"username" : "/.*"+search_string+".*/"}
+        return self.get_substring_search_results(search_string)
+        # users = self.client.Users.users.find({"username": "/a/i"});
+        # user_ls = []
+        # for user in users[:5]:
+        #     user_ls.append(user)
+        # return user_ls
+
+
+    def get_substring_search_results(self, search_string): 
+        list_of_users_to_display = []
+        print("starting ...")
+        users = self.client.Users.users.find();
+        for user in users: 
+            del user['_id']
+            
+            if "user_name" in user.keys():
+                # print("user:", user )
+                print("username", user["user_name"])
+                
+                if search_string in  user['user_name']:
+                    print("found:", user )
+
+                    list_of_users_to_display.append(user)
+
+        return list_of_users_to_display
+
+    
     def get_user_interests(self, q='',interests=True):
         user = self.get_user(q)[0]
         print("USER:",user)
@@ -211,10 +240,9 @@ class threadDatabase:
 
     def get_article_list(self,article_ids, n=10):
         article_ls=[]
-        cur = self.client.Articles.allArticles.find({'id':{'$in':article_ids}})
+        cur = self.client.Articles.allArticles.find({'id':{'$in':list(article_ids)}}).limit(n)
         for article in cur:
             del article['_id']
-            print('addd')
             article_ls.append(article)
 
         return article_ls

@@ -20,11 +20,18 @@ def update_user_interests():
         return {"msg": "success"}, 200
 
 
-@user_blueprint.route('/users', methods=['GET'])
+@user_blueprint.route('/users', methods=['GET',"POST"])
+@jwt_required()
 def get_users():
-   """ Get the users of ThreadNews """
-   if request.method == 'GET':
-      return jsonify(database_client.get_users()), 200
+    """ Get the users of ThreadNews """
+    if request.method == 'GET':
+        return jsonify(database_client.get_users()), 200
+    if request.method =='POST':
+        current_user = get_jwt_identity()
+        data = request.get_json(force=True)
+        users = database_client.get_user_list(data['user_ids'])
+        print("USERS:",users)
+        return {'result':users},200
 
 
 @user_blueprint.route('/follow_user', methods = ["POST"])
@@ -55,6 +62,7 @@ def get_reccomended_follows():
     #     return {'reccomended_users':'hey'},200
         
         #return reccomended_users,200
+        
     return {"msg":'error no users found'},407
 
 @user_blueprint.route("/edit_profile" , methods=["POST"])
@@ -73,3 +81,11 @@ def update_():
         return {'result':user}
         
 
+@user_blueprint.route("/search_user", methods=["POST"])
+def search_user():
+    if request.method == "POST":
+        data = request.get_json(
+            force=True)
+        print("DATA:", data )
+        users = database_client.search_user(data["username"])
+        return {"msg": "success", "users": users}, 200

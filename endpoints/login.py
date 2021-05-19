@@ -25,7 +25,7 @@ def try_login():
         curr_user.pop('_id', None)
 
         access_token = create_access_token(identity=curr_user)
-        return {"access_token": access_token}, 200
+        return {"access_token": access_token, "user":curr_user}, 200
 
 @login_blueprint.route('/newUser', methods=["POST"])
 def new_user():
@@ -68,4 +68,4 @@ def new_user():
         user.pop('_id', None)
         user.pop('pass_hash', None)
         access_token = create_access_token(identity=user)
-        return {"msg": "user successfully added", "access_token": access_token}, 200
+        return {"msg": "user successfully added", "access_token": access_token,'user':user}, 200

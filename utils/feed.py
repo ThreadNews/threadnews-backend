@@ -1,3 +1,4 @@
+from _pytest import config
 from flask import jsonify
 import requests
 import logging
@@ -25,13 +26,20 @@ class NewsAPICalls:
         else:
             logger.info("api key successfully identified in .config/api.conf")
 
+    def _rotate_api(self):
+        if isinstance(self.api_key, list):
+            current = self.api_key.pop(0)
+            self.api_key.append(current)
+            return current
+        return self.api_key
+
     def get_requests(self, url: str, data=None):
         """ helper function, send a get request to a specified url and any parameters """
         logger.info("{} {}".format(url, data))
         if data is None:
-            data = {"apiKey": self.api_key}
+            data = {"apiKey": self._rotate_api()}
         else:
-            data["apiKey"] = self.api_key
+            data["apiKey"] = self._rotate_api()
         return requests.get(url, params=data)
 
     def get_headlines(self, country="us"):
@@ -95,9 +103,8 @@ class NewsAPICalls:
 
 
 class NewsAPI:
-    def __init__(self, configFile, database):
-        self.db = database
-        self.api_key = configFile["NewsAPI"]["key"].strip("'")
+    def __init__(self, config):
+        self.api_key = config.get_api_keys()
         self.feed = NewsAPICalls(self.api_key)
 
     def begin_collection(self):
@@ -106,4 +113,4 @@ class NewsAPI:
 
         data = self.feed.get_headlines()["articles"]
         formatted_articles = Article.convertToDataFrame(data)
-        self.db.push_new_articles(formatted_articles)
+        return formatted_articles

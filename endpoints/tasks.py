@@ -1,6 +1,5 @@
-from backend_vars import scheduler, log, appFeed,database_client
+from backend_vars import scheduler, log, appFeed, database_client
 
-POLL_INTERVAL = 3600 #seconds
 
 test_user_ids = [
       'a49387e4-7c51-11eb-95d3-acde48001122',
@@ -8,11 +7,6 @@ test_user_ids = [
       '0e7bf4b8-7c28-11eb-95d3-acde48001122',
       '1e0a2610-a672-11eb-a5a6-acde48001122'
    ]
-
-@scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
-def feed_worker():
-   log.info("collecting articles")
-   appFeed.begin_collection()
 
 
 @scheduler.task('interval', id='test_users_likes', seconds=500000)
@@ -27,3 +21,7 @@ def test_users_actions():
       #share article 
       database_client.repost_article(user_id=user_id,article_id=article['id'])
       
+# @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
+def feed_worker():
+    log.info("collecting articles")
+    database_client.push_new_articles(appFeed.begin_collection())

@@ -43,8 +43,9 @@ urllib3==1.25.9
 virtualenv==20.0.23
 virtualenv-clone==0.5.4
 Werkzeug==1.0.1
-nltk
 wrapt==1.11.2
 flask-jwt-extended==4.0.2
 bcrypt==3.2.0
 Flask-APScheduler==1.12.1
+gunicorn>=20.1.0
+black>=21.5b0

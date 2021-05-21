@@ -9,7 +9,6 @@ test_user_ids = [
    ]
 
 
-# @scheduler.task('interval', id='test_users_likes', seconds=500000)
 def test_users_actions():
    
    for user_id in test_user_ids:
@@ -21,7 +20,6 @@ def test_users_actions():
       #share article 
       database_client.repost_article(user_id=user_id,article_id=article['id'])
       
-# @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
     log.info("collecting articles")
     database_client.push_new_articles(appFeed.begin_collection())

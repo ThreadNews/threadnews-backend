@@ -4,7 +4,7 @@ from feed import NewsAPICalls
 from database import threadDatabase
 import uuid
 import pprint
-
+from database import threadDatabase
 import threading
 import re
 import numpy as np
@@ -28,10 +28,24 @@ import spacy
 import pyLDAvis
 import pyLDAvis.gensim  # don't skip this
 import matplotlib.pyplot as plt
-import pyLDAvis
-import pyLDAvis.gensim  # don't skip this
-import matplotlib.pyplot as plt
 
+from config import threadConfiguration
+from bson import json_util
+import jsonify
+
+import uuid
+import json
+
+# import logging
+import certifi
+
+configFile = threadConfiguration()
+
+database = threadDatabase(configFile)
+appFeed = NewsAPICalls(configFile.get_configuration())
+database_client = threadDatabase(configFile.get_configuration())
+# appFeed = NewsAPICalls(configFile.get_configuration())
+# database_client = threadDatabase(configFile.get_configuration())
 # %matplotlib inline
 
 # logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.ERROR)
@@ -50,6 +64,13 @@ def make_bigrams(texts, bigram_mod):
 
 def make_trigrams(texts, bigram_mod, trigram_mod):
     return [trigram_mod[bigram_mod[doc]] for doc in texts]
+
+
+def remove_stopwords(texts):
+    return [
+        [word for word in simple_preprocess(str(doc)) if word not in stop_words]
+        for doc in texts
+    ]
 
 
 def lemmatization(texts, allowed_postags=["NOUN", "ADJ", "VERB", "ADV"]):
@@ -110,11 +131,26 @@ def get_article_text(url):
     return text
 
 
+def get_data_db(topic):
+    df.head()
+    # Convert to list
+    data = df.content.values.tolist()[:4]
+    # 7
+    # Remove Emails
+    data = [re.sub("\S*@\S*\s?", "", sent) for sent in data]
+
+    # Remove new line characters
+    data = [re.sub("\s+", " ", sent) for sent in data]
+
+
 def remove_stopwords(texts):
     return [
         [word for word in simple_preprocess(str(doc)) if word not in stop_words]
         for doc in texts
     ]
+
+    # Remove distracting single quotes
+    data = [re.sub("'", "", sent) for sent in data]
 
 
 def get_data():
@@ -206,6 +242,7 @@ def run():
 
     # Print the Keyword in the 10 topics
     pprint(lda_model.print_topics())
+    lda_model.save("lda.model")
     doc_lda = lda_model[corpus]
 
     # Compute Perplexity

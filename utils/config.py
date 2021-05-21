@@ -1,6 +1,7 @@
 import configparser
 import logging
 import os
+import json
 
 logger = logging.getLogger("root")
 
@@ -60,3 +61,10 @@ class threadConfiguration:
 
     def get_configuration(self):
         return self.config
+
+    def get_api_keys(self):
+        api_key = self.config["NewsAPI"]["key"]
+        if "," in api_key:
+            return [key.strip() for key in api_key.split(",")]
+        else:
+            return api_key

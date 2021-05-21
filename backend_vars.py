@@ -11,6 +11,6 @@ configFile = threadConfiguration()
 log.debug("initalized logger")
 
 database_client = threadDatabase(configFile.get_configuration())
-appFeed = NewsAPI(configFile.get_configuration(), database_client)
+appFeed = NewsAPI(configFile)
 # scheduler = APScheduler()
 scheduler = BackgroundScheduler()

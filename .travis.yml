@@ -10,4 +10,4 @@ install:
 # command to run tests
 script:
   - black --check ***.py
-  - pytest test/smalltest.py
+  - pytest test/*.py

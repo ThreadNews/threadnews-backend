@@ -3,6 +3,7 @@ import bcrypt
 from flask_jwt_extended import create_access_token
 from backend_vars import database_client, log
 import uuid
+import db_templates
 
 login_blueprint = Blueprint("login_blueprint", __name__)
 
@@ -27,7 +28,7 @@ def try_login():
         curr_user.pop("_id", None)
 
         access_token = create_access_token(identity=curr_user)
-        return {"access_token": access_token}, 200
+        return {"access_token": access_token, "user": curr_user}, 200
 
 
 @login_blueprint.route("/newUser", methods=["POST"])
@@ -57,15 +58,9 @@ def new_user():
 
         salt = bcrypt.gensalt()
         pass_hash = bcrypt.hashpw(str.encode(password), salt)
-        user = {
-            "user_id": str(uuid.uuid1()),
-            "user_name": username,
-            "first_name": "",
-            "last_name": "",
-            "email": email,
-            "interests": [],
-            "pass_hash": pass_hash.decode(),
-        }
+        user = db_templates.user_template(user_name=username, email=email)
+        user["pass_hash"] = (pass_hash.decode(),)
+
         log.info("successfully parsed new user information")
         result = database_client.add_user(user)
 
@@ -76,4 +71,8 @@ def new_user():
         user.pop("_id", None)
         user.pop("pass_hash", None)
         access_token = create_access_token(identity=user)
-        return {"msg": "user successfully added", "access_token": access_token}, 200
+        return {
+            "msg": "user successfully added",
+            "access_token": access_token,
+            "user": user,
+        }, 200

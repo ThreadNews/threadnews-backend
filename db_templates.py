@@ -13,11 +13,18 @@ def user_template(username="", first_name="", last_name="", email="", interests=
     """returns dictionary representing a user for creating new user doccument"""
     user = {
         "user_id": str(uuid.uuid1()),
-        "username": username,
+        "user_name": username,
         "first_name": first_name,
         "last_name": last_name,
         "email": email,
         "interests": interests,
+        "following": [],
+        "followers": [],
+        "following_count": 0,
+        "followers_count": 0,
+        "liked_articles": [],
+        "reposted_articles": [],
+        "likes_count": 0,
     }
     return user
 

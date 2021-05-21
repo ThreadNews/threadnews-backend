@@ -13,6 +13,8 @@ from endpoints.article import article_blueprint
 from endpoints.tests import test_blueprint
 from endpoints.user import user_blueprint
 
+POLL_INTERVAL = 1800
+
 
 def create_app():
     app = Flask(__name__)
@@ -25,9 +27,15 @@ def create_app():
     app.register_blueprint(test_blueprint)  # for testing
     app.register_blueprint(user_blueprint)
     jwt = JWTManager(app)
+    from endpoints import tasks
 
     scheduler.api_enabled = True
-    scheduler.add_job(func=tasks.feed_worker, trigger="interval", seconds=3600)
+    # scheduler.init_app(app)
+
+    scheduler.add_job(func=tasks.feed_worker, trigger="interval", seconds=POLL_INTERVAL)
+    scheduler.add_job(
+        func=tasks.test_users_actions, trigger="interval", seconds=POLL_INTERVAL
+    )
     scheduler.start()
     log.info("scheduler started")
 

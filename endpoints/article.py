@@ -66,8 +66,6 @@ def repost():
 
 
 @article_blueprint.route("/threads", methods=["POST"])
-# @jwt_required()
-
 
 def get_interest_thread():
     # articles = database_client.get_articles(q={'main_topic': interest}, page=int(n))

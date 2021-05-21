@@ -35,8 +35,10 @@ import jsonify
 
 import uuid
 import json
+
 # import logging
 import certifi
+
 configFile = threadConfiguration()
 
 database = threadDatabase(configFile)
@@ -63,10 +65,12 @@ def make_bigrams(texts, bigram_mod):
 def make_trigrams(texts, bigram_mod, trigram_mod):
     return [trigram_mod[bigram_mod[doc]] for doc in texts]
 
+
 def remove_stopwords(texts):
-    return [[word for word in simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
-
-
+    return [
+        [word for word in simple_preprocess(str(doc)) if word not in stop_words]
+        for doc in texts
+    ]
 
 
 def lemmatization(texts, allowed_postags=["NOUN", "ADJ", "VERB", "ADV"]):
@@ -131,13 +135,14 @@ def get_data_db(topic):
     df.head()
     # Convert to list
     data = df.content.values.tolist()[:4]
-    #7
+    # 7
     # Remove Emails
-    data = [re.sub('\S*@\S*\s?', '', sent) for sent in data]
+    data = [re.sub("\S*@\S*\s?", "", sent) for sent in data]
 
     # Remove new line characters
-    data = [re.sub('\s+', ' ', sent) for sent in data]
-    
+    data = [re.sub("\s+", " ", sent) for sent in data]
+
+
 def remove_stopwords(texts):
     return [
         [word for word in simple_preprocess(str(doc)) if word not in stop_words]
@@ -145,7 +150,8 @@ def remove_stopwords(texts):
     ]
 
     # Remove distracting single quotes
-    data = [re.sub("\'", "", sent) for sent in data]
+    data = [re.sub("'", "", sent) for sent in data]
+
 
 def get_data():
     """gets da"""

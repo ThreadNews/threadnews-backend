@@ -18,14 +18,13 @@ def user_template(username="", first_name="", last_name="", email="", interests=
         "last_name": last_name,
         "email": email,
         "interests": interests,
-        "following":[],
-        "followers":[],
-        "following_count":0,
-        "followers_count":0,
-        "liked_articles":[],
-        "reposted_articles":[],
-        "likes_count":0,
-        
+        "following": [],
+        "followers": [],
+        "following_count": 0,
+        "followers_count": 0,
+        "liked_articles": [],
+        "reposted_articles": [],
+        "likes_count": 0,
     }
     return user
 

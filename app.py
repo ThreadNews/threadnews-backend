@@ -28,6 +28,7 @@ def create_app():
     app.register_blueprint(user_blueprint)
     jwt = JWTManager(app)
     from endpoints import tasks
+
     scheduler.api_enabled = True
     # scheduler.init_app(app)
 

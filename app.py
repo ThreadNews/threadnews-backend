@@ -29,7 +29,7 @@ def create_app():
     jwt = JWTManager(app)
     from endpoints import tasks
     scheduler.api_enabled = True
-    scheduler.init_app(app)
+    # scheduler.init_app(app)
 
     scheduler.add_job(func=tasks.feed_worker, trigger="interval", seconds=POLL_INTERVAL)
     scheduler.start()

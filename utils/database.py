@@ -28,9 +28,8 @@ class threadDatabase:
         else:
             logger.info("database has been successfully hooked up")
         self.client = MongoClient(
-            database.format(user, password), tlsCAFile=certifi.where()
+           database.format(user, password), tlsCAFile=certifi.where()
         )
-        
 
     def get_article_by_id(self,article_id):
         articles = self.client.Articles.allArticles.find(

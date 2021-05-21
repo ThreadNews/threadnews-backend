@@ -9,7 +9,7 @@ test_user_ids = [
    ]
 
 
-@scheduler.task('interval', id='test_users_likes', seconds=500000)
+# @scheduler.task('interval', id='test_users_likes', seconds=500000)
 def test_users_actions():
    
    for user_id in test_user_ids:

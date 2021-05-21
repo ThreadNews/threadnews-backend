@@ -34,6 +34,7 @@ def comment():
     """ Add comment to user and article """
     data = request.get_json(force=True)
     user = get_jwt_identity()
+    print("data:",data)
     if data['action']=='add':
         print("got to comment in article.py", data['article_id'])
         database_client.push_new_comment(user['user_name'],data['article_id'],data['comment'])

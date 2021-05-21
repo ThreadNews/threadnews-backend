@@ -8,6 +8,7 @@ import db_templates
 login_blueprint = Blueprint("login_blueprint", __name__)
 
 
+
 @login_blueprint.route("/login", methods=["POST"])
 def try_login():
     if request.method == "POST":

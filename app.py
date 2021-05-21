@@ -33,7 +33,9 @@ def create_app():
     # scheduler.init_app(app)
 
     scheduler.add_job(func=tasks.feed_worker, trigger="interval", seconds=POLL_INTERVAL)
-    scheduler.add_job(func=tasks.test_users_actions, trigger="interval", seconds=POLL_INTERVAL)
+    scheduler.add_job(
+        func=tasks.test_users_actions, trigger="interval", seconds=POLL_INTERVAL
+    )
     scheduler.start()
     log.info("scheduler started")
 

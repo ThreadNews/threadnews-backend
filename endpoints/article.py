@@ -65,7 +65,7 @@ def repost():
     return {""}
 
 @article_blueprint.route("/save",methods = ["POST"])
-@jwt_required
+@jwt_required()
 def save_article():
     """Save article to user and article"""
     data = request.get_json(force=True)
@@ -78,8 +78,8 @@ def save_article():
         return {"msg": "removed liked article"}, 200
     return {""}
 
-@article_blueprint.route("/threads", methods=["POST"])
 
+@article_blueprint.route("/threads", methods=["POST"])
 def get_interest_thread():
     # articles = database_client.get_articles(q={'main_topic': interest}, page=int(n))
     data = request.get_json(force=True)

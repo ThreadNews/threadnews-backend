@@ -9,11 +9,11 @@ file = open("common_words.txt")
 commons = file.read().replace("\t", " ").replace("\n", " ").split(" ")
 
 
-def user_template(username="", first_name="", last_name="", email="", interests=[]):
+def user_template(user_name="", first_name="", last_name="", email="", interests=[]):
     """returns dictionary representing a user for creating new user doccument"""
     user = {
         "user_id": str(uuid.uuid1()),
-        "user_name": username,
+        "user_name": user_name,
         "first_name": first_name,
         "last_name": last_name,
         "email": email,

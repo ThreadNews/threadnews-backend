@@ -89,7 +89,7 @@ def search_user():
     if request.method == "POST":
         data = request.get_json(force=True)
         print("DATA:", data)
-        users = database_client.search_user(data["username"])
+        users = database_client.search_user(data["user_name"])
         return {"msg": "success", "users": users}, 200
 
 

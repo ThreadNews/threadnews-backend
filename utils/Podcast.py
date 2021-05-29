@@ -8,6 +8,23 @@ class SpotifyPodcasts:
         self.scope =  'user-read-currently-playing user-modify-playback-state user-library-modify playlist-modify-public playlist-read-collaborative playlist-read-private playlist-modify-private'
         self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=self.scope, client_secret="6ee1722e4bf14ae499a1ceda45c81e92", client_id="0e57bf8a5bc0404aa228a4ad5374683b",redirect_uri='http://localhost:8000'))
 
+    
+    def create_a_list_of_all_podcasts(self, all_topics):
+        all_podcasts = []
+        for topic in all_topics:
+            shows = self.sp.search(q=topic, type="show")
+            shows = shows['shows']
+            items = shows['items']
+
+            for item in items:
+                podcast_list_dict= {"topic": topic, "name": item['name'], "images": item['images'], "publisher": item["publisher"], "uri": item["uri"],
+                                      "description": item["description"]}
+                all_podcasts.append(podcast_list_dict)
+
+        return all_podcasts
+    
+    
+    
     def get_a_random_podcast(self, interest_list, limit=20):
         """
         Description: Gives a collection of podcasts that

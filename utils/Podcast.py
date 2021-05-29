@@ -2,6 +2,70 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import random
 
+TOPIC_LIST = [
+  "Architecture",
+  "Remodeling",
+  "DIY",
+  "Garden stuff",
+  "Pop Culture",
+  "Music News",
+  "Actors",
+  "Tik Tok",
+  "K Pop",
+  "Economics",
+  "Stocks",
+  "Investing",
+  "Budgeting",
+  "Crypto",
+  "Retirement",
+  "Fitness",
+  "Healthy Living",
+  "Women's Health",
+  "Mens Health",
+  "Clean Eating",
+  "Sports",
+  "College Sports",
+  "Pro Sports",
+  "Football",
+  "Soccer",
+  "Hockey",
+  "BasketBall",
+  "Rugby",
+  "Surfing",
+  "Running",
+  "Golf",
+  "Tennis",
+  "Beauty",
+  "Skincare",
+  "Cleansing",
+  "Hair",
+  "Nails",
+  "Technology",
+  "Startups",
+  "Big Tech",
+  "Programming",
+  "Graphic Design",
+  "Big Tech",
+  "Programming",
+  "Graphic Design",
+  "Sports",
+  "Stocks",
+  "Surfing",
+  "Weather",
+  "Skincare",
+  "Cleansing",
+  "Crypto",
+  "Healthy Living",
+  "Healthy Living",
+  "DIY",
+  "Freelancing",
+  "Blogging",
+  "K Pop",
+  "Math",
+  "Cannabis",
+  "Golf",
+];
+
 class SpotifyPodcasts:
 
     def __init__(self):
@@ -9,9 +73,9 @@ class SpotifyPodcasts:
         self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=self.scope, client_secret="6ee1722e4bf14ae499a1ceda45c81e92", client_id="0e57bf8a5bc0404aa228a4ad5374683b",redirect_uri='http://localhost:8000'))
 
     
-    def create_a_list_of_all_podcasts(self, all_topics):
+    def create_a_list_of_all_podcasts(self):
         all_podcasts = []
-        for topic in all_topics:
+        for topic in TOPIC_LIST:
             shows = self.sp.search(q=topic, type="show")
             shows = shows['shows']
             items = shows['items']

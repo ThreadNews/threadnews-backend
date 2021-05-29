@@ -284,6 +284,22 @@ class threadDatabase:
         logger.info("inserted {} new articles".format(inserted))
         return {"msg": "success"}, 200
 
+
+    def get_new_podcasts(self): 
+        spot = SpotifyPodcasts()
+        return spot.create_a_list_of_all_podcasts()
+
+    def push_new_podcasts(self):
+        inserted = 0
+        podcasts = self.get_new_podcasts()
+        logger.info("trying to insert {} podcasts".format(len(podcasts)))
+        for podcast in podcasts:
+            self.client.Podcasts.allPodcasts.insert_one(podcast)
+            inserted += 1
+
+        logger.info("inserted {} new  podcasts".format(inserted))
+        return {"msg": "success"}, 200
+
     def push_new_like(self, user_id, article_id):
         # add like article document
         self.client.Users.users.update_one(

@@ -1,6 +1,9 @@
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import random
+import logging 
+
+logger = logging.getLogger("root")
 
 TOPIC_LIST = [
   "Architecture",
@@ -66,17 +69,13 @@ TOPIC_LIST = [
   "Golf",
 ];
 
-class SpotifyPodcasts:
-
-    def __init__(self):
-        self.scope =  'user-read-currently-playing user-modify-playback-state user-library-modify playlist-modify-public playlist-read-collaborative playlist-read-private playlist-modify-private'
-        self.sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=self.scope, client_secret="6ee1722e4bf14ae499a1ceda45c81e92", client_id="0e57bf8a5bc0404aa228a4ad5374683b",redirect_uri='http://localhost:8000'))
+class Podcast:
 
     
     def create_a_list_of_all_podcasts(self):
         all_podcasts = []
         for topic in TOPIC_LIST:
-            shows = self.sp.search(q=topic, type="show")
+            shows = self.podcast_sp.search(q=topic, type="show")
             shows = shows['shows']
             items = shows['items']
 
@@ -139,8 +138,40 @@ class SpotifyPodcasts:
 
         return index_list
 
+    def push_new_podcasts(self):
+        inserted = 0
+        podcasts = self.create_a_list_of_all_podcasts()
+        
+        logger.info("trying to insert {} podcasts\n".format(len(podcasts)))
+        for podcast in podcasts:
+            self.client.Podcasts.allPodcasts.insert_one(podcast)
+            inserted += 1
 
-interest_list = ["technology", "fashion", "politics", "beauty", "pop culture"]
-spot = SpotifyPodcasts()
-random_pods = spot.get_a_random_podcast(interest_list)
-print(random_pods)
+        #logger.info("inserted {} new  podcasts\n".format(inserted))
+        return ({"msg": "success"}, 200)
+
+    def get_all_podcasts(self, q={}, page=1):
+        """ Gets all the in a dictionary like way"""
+        logger.info(f"getting podcasts {q}: page number {page}")
+        payload = json.loads(
+            json.dumps(
+                list(
+                    self.client.Podcasts.allPodcasts.find(q)
+                    .skip((page - 1) * _SIZE)
+                    .limit((page - 1) * _SIZE + _SIZE)
+                ),
+                default=json_util.default,
+            )
+        )
+        
+        if len(payload) == 0:
+            return {"message": "no articles possible"}, 404
+
+        else:
+            return payload 
+
+# social features 
+#list = ["technology", "fashion", "politics", "beauty", "pop culture"]
+#spot = SpotifyPodcasts()
+#random_pods = spot.get_a_random_podcast(interest_list)
+

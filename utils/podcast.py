@@ -73,9 +73,11 @@ TOPIC_LIST = [
 
 
 class Podcast:
-    def create_a_list_of_all_podcasts(self):
+    def create_a_list_of_all_podcasts(self, limit):
         all_podcasts = []
         for topic in TOPIC_LIST:
+            if limit >len(all_podcasts): 
+                break 
             shows = self.podcast_sp.search(q=topic, type="show")
             shows = shows["shows"]
             items = shows["items"]
@@ -146,17 +148,14 @@ class Podcast:
 
         return index_list
 
-    def push_new_podcasts(self, limit ):
+    def push_new_podcasts(self, limit=700):
         inserted = 0
-        podcasts = self.create_a_list_of_all_podcasts()
+        podcasts = self.create_a_list_of_all_podcasts(limit)
 
 
         logger.info("trying to insert {} podcasts\n".format(len(podcasts)))
         
         for podcast in podcasts:
-            if inserted >= limit:
-                break 
-            
             self.client.Podcasts.allPodcasts.insert_one(podcast)
             inserted += 1
 

@@ -7,7 +7,6 @@ import certifi
 import time
 import collections
 from operator import itemgetter
-from utils.feed import NewsAPICalls
 import random
 from utils.user import User
 from utils.social_features import SocialFeatures

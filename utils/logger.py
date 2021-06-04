@@ -14,3 +14,6 @@ def setup_logger(name):
     log.addHandler(handler)
 
     return log
+
+
+## make sure this is not None

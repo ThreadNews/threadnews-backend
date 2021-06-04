@@ -26,7 +26,7 @@ def like_article():
         database_client.push_new_like(current_user["user_id"], data["article_id"])
     if data["action"] == "delete":
         database_client.delete_like(data["user_id"], data["article_id"])
-    return {"msg":"success"},200
+    return {"msg": "success"}, 200
 
 
 @article_blueprint.route("/comment", methods=["POST"])
@@ -64,7 +64,8 @@ def repost():
         return {"msg": "liked article"}, 200
     return {""}
 
-@article_blueprint.route("/save",methods = ["POST"])
+
+@article_blueprint.route("/save", methods=["POST"])
 @jwt_required()
 def save_article():
     """Save article to user and article"""

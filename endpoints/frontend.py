@@ -1,6 +1,7 @@
 from flask import request, Blueprint, Response
 import json
 import os
+from utils.Podcast import SpotifyPodcast
 
 front_blueprint = Blueprint("front_blueprint", __name__)
 
@@ -19,3 +20,17 @@ def get_categoy_bubble_data():
     elif request.method == "POST":
         # update data in db - not implemented yet
         return Response(response={}, status=404)
+
+
+@front_blueprint.route("/podcasts", methods=["POST"])
+def get_podcasts():
+    # return json object that is used used to construct bubbles
+
+    # return data
+    if request.method == "POST":
+        data = request.get_json(force=True)
+        interest_list = data["interest_list"]
+        spot = SpotifyPodcasts()
+        random_pods = spot.get_a_random_podcast(interest_list)
+        # update data in db - not implemented yet
+        return {"result": random_pods}, 200

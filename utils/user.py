@@ -1,10 +1,9 @@
-
-class User: 
+class User:
     def get_user_list(self, user_ls):
         if type(user_ls) == dict:
             user_ls = list(user_ls.values())
         return self.get_user(q={"user_id": {"$in": user_ls}})
- 
+
     def get_substring_search_results(self, search_string):
         list_of_users_to_display = []
         print("starting ...")
@@ -22,14 +21,14 @@ class User:
                     list_of_users_to_display.append(user)
 
         return list_of_users_to_display
- 
+
     def get_users(self):
         """ Retrieves users """
         logger.info("getting users")
         return json.loads(
             json.dumps(list(self.client.Users.users.find()), default=json_util.default)
         )
-        
+
     def get_user(self, q=""):
         """ Retrieves users """
         logger.info("getting users")
@@ -176,5 +175,3 @@ class User:
 
         self.client.User.users.update_one({"user_id": user_id}, {"$set": new_info})
         return new_info
-
- 

@@ -1,5 +1,6 @@
 import uuid
-import random 
+import random
+
 
 class Article:
     @staticmethod
@@ -21,7 +22,6 @@ class Article:
         if isinstance(article_data, list):
             return [convertor(article) for article in article_data]
         return [convertor(article_data)]
-
 
     def get_random_article(self):
         """Gets random article (used for test users)"""
@@ -262,4 +262,3 @@ class Article:
             {"id": article_id}, {"$inc": {"likes": -1}}
         )
         return 200
-

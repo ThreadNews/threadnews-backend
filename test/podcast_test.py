@@ -3,21 +3,20 @@ from utils.feed import NewsAPI
 from utils.config import threadConfiguration
 from utils.database import threadDatabase
 import sys, os
-import logging 
+import logging
+
 
 @pytest.fixture
-def database(): 
+def database():
     return threadDatabase(threadConfiguration().get_configuration())
+
 
 def test_push_new_podcasts(database):
     result = database.push_new_podcasts()
     assert result[1] == 200
 
 
-
-
-
-# def get_new_podcasts(self): 
+# def get_new_podcasts(self):
 #     spot = SpotifyPodcasts()
 #     return spot.create_a_list_of_all_podcasts()
 

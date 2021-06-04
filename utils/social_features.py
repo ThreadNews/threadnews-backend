@@ -1,4 +1,3 @@
-
 class SocialFeatures:
     def follow_user(self, user_id1, user_id2, unfollow=False):
         """user 1 follows or unfollows user 2"""
@@ -65,4 +64,3 @@ class SocialFeatures:
         ctr_dict = dict(sorted(ctr.items(), key=itemgetter(1), reverse=True)[:N])
 
         return {"result": list(ctr_dict.keys())}
-

@@ -3,6 +3,8 @@ from spotipy.oauth2 import SpotifyOAuth
 import random
 import logging
 
+
+# implement threading for the podcast uploading 
 logger = logging.getLogger("root")
 
 TOPIC_LIST = [
@@ -144,12 +146,17 @@ class Podcast:
 
         return index_list
 
-    def push_new_podcasts(self):
+    def push_new_podcasts(self, limit ):
         inserted = 0
         podcasts = self.create_a_list_of_all_podcasts()
 
+
         logger.info("trying to insert {} podcasts\n".format(len(podcasts)))
+        
         for podcast in podcasts:
+            if inserted >= limit:
+                break 
+            
             self.client.Podcasts.allPodcasts.insert_one(podcast)
             inserted += 1
 

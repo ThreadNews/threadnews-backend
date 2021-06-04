@@ -12,7 +12,7 @@ def database():
 
 
 def test_push_new_podcasts(database):
-    result = database.push_new_podcasts()
+    result = database.push_new_podcasts(limit=3)
     assert result[1] == 200
 
 

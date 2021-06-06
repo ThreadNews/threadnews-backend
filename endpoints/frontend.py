@@ -1,7 +1,7 @@
 from flask import request, Blueprint, Response
 import json
 import os
-from utils.Podcast import SpotifyPodcast
+from utils.podcast import SpotifyPodcast
 
 front_blueprint = Blueprint("front_blueprint", __name__)
 
@@ -33,4 +33,4 @@ def get_podcasts():
         spot = SpotifyPodcasts()
         random_pods = spot.get_a_random_podcast(interest_list)
         # update data in db - not implemented yet
-        return {"result": random_pods}, 200
+        return {"podcasts": random_pods}, 200

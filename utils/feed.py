@@ -1,5 +1,3 @@
-from _pytest import config
-from flask import jsonify
 import requests
 import logging
 from .article import Article
@@ -43,14 +41,18 @@ class NewsAPICalls:
             data = {"apiKey": self._rotate_api()}
         else:
             data["apiKey"] = self._rotate_api()
-        return requests.get(url, params=data)
+        
+        try:
+            return requests.get(url, params=data)
+        except:
+            return None
 
     def get_headlines(self, country="us"):
         """get headlines from a specified country (default is US)"""
         r = self.get_requests(HEADLINES, data={"country": country})
 
         if r.status_code != 200:
-            return jsonify({"error": "internal errorr"}), 500
+            return {"error": "internal errorr"}, 500
         return r.json()
 
     def get_sources(self):
@@ -58,7 +60,7 @@ class NewsAPICalls:
         r = self.get_requests(SOURCES)
 
         if r.status_code != 200:
-            return jsonify({"error": "internal errorr"}), 500
+            return {"error": "internal errorr"}, 500
         return r.json()
 
     def get_feed(
@@ -77,7 +79,7 @@ class NewsAPICalls:
     ):
         """retrieves a feed from a queried item plus any other parameters"""
         if q is None or q == "":
-            return jsonify({"error": "empty query"}), 400
+            return {"error": "empty query"}, 400
 
         data = {"q": q}
 
@@ -101,7 +103,7 @@ class NewsAPICalls:
 
         r = self.get_requests(FEED, data=data)
         if r.status_code != 200:
-            return jsonify({"error": "internal error"}), 500
+            return {"error": "internal error"}, 500
         return r.json()
 
 
@@ -114,7 +116,8 @@ class NewsAPI:
         """current implementation makes use of hourly pull"""
         # todo: add more items to add articles to the database
         rand_topic = choice(TOPIC_LIST)
-        data = self.feed.get_headlines(q=rand_topic)["articles"]
+        data = self.feed.get_feed(q=rand_topic)["articles"]
+        data += self.feed.get_headlines()["articles"]
         formatted_articles = Article.convertToDataFrame(data, topic=rand_topic)
 
         return formatted_articles

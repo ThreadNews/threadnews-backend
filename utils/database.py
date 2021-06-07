@@ -7,7 +7,6 @@ import certifi
 import time
 import collections
 from operator import itemgetter
-from utils.feed import NewsAPICalls
 import random
 from utils.user import User
 from utils.social_features import SocialFeatures
@@ -21,6 +20,8 @@ _SIZE = 20
 
 
 class threadDatabase(User, Article, Podcast, SocialFeatures):
+    """ class uses multiple inheritince to seperate database functionality into
+    user, article, podcast and social feature interactions"""
 
     # class wide var for spotify database
     def __init__(self, config):

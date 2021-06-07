@@ -23,9 +23,9 @@ def like_article():
     data = request.get_json(force=True)
     current_user = get_jwt_identity()
     if data["action"] == "add":
-        database_client.push_new_like(current_user["user_id"], data["article_id"])
+        database_client.push_new_like(current_user["user_id"], data["id"])
     if data["action"] == "delete":
-        database_client.delete_like(data["user_id"], data["article_id"])
+        database_client.delete_like(data["user_id"], data["id"])
     return {"msg": "success"}, 200
 
 
@@ -35,19 +35,13 @@ def comment():
     """ Add comment to user and article """
     data = request.get_json(force=True)
     user = get_jwt_identity()
-    print("data:", data)
-    if data["action"] == "add":
-        print("got to comment in article.py", data["article_id"])
-        database_client.push_new_comment(
-            user["user_name"], data["article_id"], data["comment"]
-        )
-        return {"msg": "liked article"}, 200
-    elif data["action"] == "remove":
-        database_client.push_new_comment(
-            user["user_name"], data["article_id"], data["comment"], add=False
-        )
-        return {"msg": "comment added"}, 200
-    return {""}
+    
+    add = True if data['add'] else False
+
+    database_client.push_new_comment(
+        user["user_name"], data["article_id"], data["comment"],add=add
+    )
+    return {"msg": "comment added"}, 200
 
 
 @article_blueprint.route("/repost", methods=["POST"])
@@ -57,10 +51,10 @@ def repost():
     data = request.get_json(force=True)
     user = get_jwt_identity()
     if data["action"] == "add":
-        database_client.repost_article(user["user_name"], data["article_id"])
+        database_client.repost_article(user["user_name"], data["id"])
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
-        database_client.repost_article(user["user_name"], data["article_id"], add=True)
+        database_client.repost_article(user["user_name"], data["id"], add=True)
         return {"msg": "liked article"}, 200
     return {""}
 
@@ -72,10 +66,10 @@ def save_article():
     data = request.get_json(force=True)
     user = get_jwt_identity()
     if data["action"] == "add":
-        database_client.push_new_save(user["user_name"], data["article_id"])
+        database_client.push_new_save(user["user_name"], data["id"])
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
-        database_client.delete_save(user["user_name"], data["article_id"], add=True)
+        database_client.delete_save(user["user_name"], data["id"], add=True)
         return {"msg": "removed liked article"}, 200
     return {""}
 

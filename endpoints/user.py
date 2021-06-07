@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import jsonify
+
 
 user_blueprint = Blueprint("user_blueprint", __name__)
 

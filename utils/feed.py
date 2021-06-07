@@ -1,7 +1,7 @@
 import requests
 import logging
 from .article import Article
-from data import TOPIC_LIST
+from utils.data import TOPIC_LIST
 from random import choice
 
 HEADLINES = "https://newsapi.org/v2/top-headlines"

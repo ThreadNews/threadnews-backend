@@ -18,7 +18,7 @@ def article_list():
 @article_blueprint.route("/like", methods=["POST"])
 @jwt_required()
 def like_article():
-    """ Add/Delete like to article and user """
+    """Add/Delete like to article and user"""
     # if request.method == "POST":
     data = request.get_json(force=True)
     current_user = get_jwt_identity()
@@ -32,14 +32,14 @@ def like_article():
 @article_blueprint.route("/comment", methods=["POST"])
 @jwt_required()
 def comment():
-    """ Add comment to user and article """
+    """Add comment to user and article"""
     data = request.get_json(force=True)
     user = get_jwt_identity()
-    
-    add = True if data['add'] else False
+
+    add = True if data["add"] else False
 
     database_client.push_new_comment(
-        user["user_name"], data["article_id"], data["comment"],add=add
+        user["user_name"], data["article_id"], data["comment"], add=add
     )
     return {"msg": "comment added"}, 200
 
@@ -47,7 +47,7 @@ def comment():
 @article_blueprint.route("/repost", methods=["POST"])
 @jwt_required()
 def repost():
-    """ Add comment to user and article """
+    """Add comment to user and article"""
     data = request.get_json(force=True)
     user = get_jwt_identity()
     if data["action"] == "add":

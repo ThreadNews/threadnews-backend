@@ -1,6 +1,6 @@
 import uuid
 import random
-import logging 
+import logging
 import json
 from bson import json_util
 import time
@@ -8,6 +8,7 @@ import time
 
 logger = logging.getLogger("root")
 _SIZE = 20
+
 
 class Article:
     @staticmethod
@@ -43,7 +44,7 @@ class Article:
         return article
 
     def get_articles(self, q={}, page=1):
-        """ Retrieves articles """
+        """Retrieves articles"""
         logger.info(f"getting articles {q}: page number {page}")
         payload = json.loads(
             json.dumps(
@@ -58,7 +59,7 @@ class Article:
         if len(payload) == 0:
             return {"message": "no articles possible"}, 404
 
-        return 200 
+        return 200
 
     def get_article_by_id(self, article_id):
         articles = self.client.Articles.allArticles.find({"id": article_id})
@@ -93,7 +94,7 @@ class Article:
         self.client.Articles.allArticles.update_one(
             {"id": article_id}, {"$inc": {"likes": 1}}
         )
-        return 200 
+        return 200
 
     def repost_article(self, user_id, article_id, add=True):
         op = "$push" if not add else "$pull"
@@ -108,7 +109,7 @@ class Article:
         self.client.Articles.allArticles.update_one(
             {"id": article_id}, {"$inc": {"reposts": 1}}
         )
-        return 200 
+        return 200
 
     def remove_likes_articles(self, user_id, article_id):
         self.client.Users.users.update_one(
@@ -122,7 +123,7 @@ class Article:
         self.client.Articles.allArticles.update_one(
             {"id": article_id}, {"$dec": {"likes": 1}}
         )
-        return 200 
+        return 200
 
     def push_new_comment(self, user_name, article_id, comment, add=True):
         # add comment to user document(comment, article_id)
@@ -158,7 +159,7 @@ class Article:
         self.client.Articles.allArticles.update_one(
             {"id": article_id}, {"$dec": {"likes": 1}}
         )
-        return 200 
+        return 200
 
     def push_new_comment(self, user_name, article_id, comment):
         # add comment to user document(comment, article_id)

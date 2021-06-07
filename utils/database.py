@@ -48,10 +48,6 @@ class threadDatabase(User, Article, Podcast, SocialFeatures):
             logger.critical("user or password has not been changed!")
         else:
             logger.info("database has been successfully hooked up")
-        # self.client = MongoClient(
-        #     database.format(user, password), tlsCAFile=certifi.where()
-        # )
-
         self.client = MongoClient(
-            "mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net"
+            database.format(user, password), tlsCAFile=certifi.where()
         )

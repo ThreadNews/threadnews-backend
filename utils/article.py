@@ -12,7 +12,7 @@ _SIZE = 20
 
 class Article:
     @staticmethod
-    def convertToDataFrame(article_data,topic=""):
+    def convertToDataFrame(article_data, topic=""):
         def convertor(article):
             unique_bytes = ""
             if article["author"]:

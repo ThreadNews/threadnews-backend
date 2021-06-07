@@ -4,12 +4,11 @@ import random
 import logging
 import json
 from bson import json_util
-from backend_vars import TOPIC_LIST
+from data import TOPIC_LIST
 
 # implement threading for the podcast uploading
 logger = logging.getLogger("root")
 _SIZE = 20
-
 
 
 class Podcast:

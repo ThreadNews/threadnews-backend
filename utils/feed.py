@@ -3,8 +3,9 @@ from flask import jsonify
 import requests
 import logging
 from .article import Article
+from data import TOPIC_LIST
 from random import choice
-from backend_vars import TOPIC_LIST
+
 HEADLINES = "https://newsapi.org/v2/top-headlines"
 SOURCES = "https://newsapi.org/v2/sources"
 FEED = "https://newsapi.org/v2/everything"
@@ -13,6 +14,7 @@ DEFAULT_LANG = "en"
 DEFAULT_SORT = "popularity"
 DEFAULT_SIZE = 50
 STARTING_PAGE = 1
+
 
 
 logger = logging.getLogger("root")
@@ -113,7 +115,7 @@ class NewsAPI:
         """current implementation makes use of hourly pull"""
         # todo: add more items to add articles to the database
         rand_topic = choice(TOPIC_LIST)
-        data = self.feed.get_headlines(q = rand_topic)["articles"]
-        formatted_articles = Article.convertToDataFrame(data,topic = rand_topic)
+        data = self.feed.get_headlines(q=rand_topic)["articles"]
+        formatted_articles = Article.convertToDataFrame(data, topic=rand_topic)
 
         return formatted_articles

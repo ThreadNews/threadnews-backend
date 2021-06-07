@@ -1,3 +1,9 @@
+import json
+from bson import json_util
+import logging 
+logger = logging.getLogger("root")
+
+
 class User:
     def get_user_list(self, user_ls):
         if type(user_ls) == dict:
@@ -12,12 +18,7 @@ class User:
             del user["_id"]
 
             if "user_name" in user.keys():
-                # print("user:", user )
-                print("username", user["user_name"])
-
                 if search_string in user["user_name"]:
-                    print("found:", user)
-
                     list_of_users_to_display.append(user)
 
         return list_of_users_to_display
@@ -39,11 +40,7 @@ class User:
     def search_user(self, search_string):
         q = {"username": "/.*" + search_string + ".*/"}
         return self.get_substring_search_results(search_string)
-        # users = self.client.Users.users.find({"username": "/a/i"});
-        # user_ls = []
-        # for user in users[:5]:
-        #     user_ls.append(user)
-        # return user_ls
+        
 
     def add_user(self, new_user=None):
         logger.info("trying to add new user")

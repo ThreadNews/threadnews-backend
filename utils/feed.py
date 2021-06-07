@@ -17,7 +17,7 @@ logger = logging.getLogger("root")
 
 
 class NewsAPICalls:
-    """ Wrapper class for NewsAPI calls """
+    """Wrapper class for NewsAPI calls"""
 
     def __init__(self, api_key):
         self.api_key = api_key
@@ -34,7 +34,7 @@ class NewsAPICalls:
         return self.api_key
 
     def get_requests(self, url: str, data=None):
-        """ helper function, send a get request to a specified url and any parameters """
+        """helper function, send a get request to a specified url and any parameters"""
         logger.info("{} {}".format(url, data))
         if data is None:
             data = {"apiKey": self._rotate_api()}
@@ -43,7 +43,7 @@ class NewsAPICalls:
         return requests.get(url, params=data)
 
     def get_headlines(self, country="us"):
-        """ get headlines from a specified country (default is US) """
+        """get headlines from a specified country (default is US)"""
         r = self.get_requests(HEADLINES, data={"country": country})
 
         if r.status_code != 200:
@@ -51,7 +51,7 @@ class NewsAPICalls:
         return r.json()
 
     def get_sources(self):
-        """ retrieves the current sources gathered from NewsAPI """
+        """retrieves the current sources gathered from NewsAPI"""
         r = self.get_requests(SOURCES)
 
         if r.status_code != 200:
@@ -72,7 +72,7 @@ class NewsAPICalls:
         page_size=100,
         page=1,
     ):
-        """ retrieves a feed from a queried item plus any other parameters """
+        """retrieves a feed from a queried item plus any other parameters"""
         if q is None or q == "":
             return jsonify({"error": "empty query"}), 400
 
@@ -108,7 +108,7 @@ class NewsAPI:
         self.feed = NewsAPICalls(self.api_key)
 
     def begin_collection(self):
-        """ current implementation makes use of hourly pull """
+        """current implementation makes use of hourly pull"""
         # todo: add more items to add articles to the database
 
         data = self.feed.get_headlines()["articles"]

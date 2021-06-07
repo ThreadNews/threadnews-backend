@@ -2,10 +2,12 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import random
 import logging
-
+import json
+from bson import json_util
 
 # implement threading for the podcast uploading 
 logger = logging.getLogger("root")
+_SIZE = 20
 
 TOPIC_LIST = [
     "Architecture",
@@ -162,7 +164,7 @@ class Podcast:
         # logger.info("inserted {} new  podcasts\n".format(inserted))
         return ({"msg": "success"}, 200)
 
-    def get_all_podcasts(self, q={}, page=1):
+    def get_all_podcasts(self, q={}, page=1,limit=20):
         """ Gets all the in a dictionary like way"""
         logger.info(f"getting podcasts {q}: page number {page}")
         payload = json.loads(
@@ -180,10 +182,7 @@ class Podcast:
             return {"message": "no articles possible"}, 404
 
         else:
+            print(payload)
             return payload
 
 
-# social features
-# list = ["technology", "fashion", "politics", "beauty", "pop culture"]
-# spot = SpotifyPodcasts()
-# random_pods = spot.get_a_random_podcast(interest_list)

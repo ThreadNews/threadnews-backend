@@ -20,6 +20,8 @@ _SIZE = 20
 
 
 class threadDatabase(User, Article, Podcast, SocialFeatures):
+    """ class uses multiple inheritince to seperate database functionality into
+    user, article, podcast and social feature interactions"""
 
     # class wide var for spotify database
     def __init__(self, config):

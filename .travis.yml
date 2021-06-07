@@ -11,4 +11,4 @@ install:
 script:
   - pwd; ls
   - black --check ***.py
-  - pytest --cov-report term --cov=utils/ test/
+  - python -m pytest --cov-report term --cov=utils/ test/

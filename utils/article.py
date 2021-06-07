@@ -12,7 +12,7 @@ _SIZE = 20
 
 class Article:
     @staticmethod
-    def convertToDataFrame(article_data):
+    def convertToDataFrame(article_data, topic=""):
         def convertor(article):
             unique_bytes = ""
             if article["author"]:
@@ -23,7 +23,7 @@ class Article:
                 unique_bytes += article["url"]
             article["id"] = str(uuid.uuid5(uuid.NAMESPACE_DNS, unique_bytes))
             article["global_score"] = 50
-            article["main_topic"] = ""
+            article["main_topic"] = topic
             article["tags"] = {}
             return article
 

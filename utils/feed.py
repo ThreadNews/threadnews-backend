@@ -16,7 +16,6 @@ DEFAULT_SIZE = 50
 STARTING_PAGE = 1
 
 
-
 logger = logging.getLogger("root")
 
 

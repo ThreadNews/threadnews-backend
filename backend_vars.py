@@ -14,5 +14,3 @@ database_client = threadDatabase(configFile.get_configuration())
 appFeed = NewsAPI(configFile)
 # scheduler = APScheduler()
 scheduler = BackgroundScheduler()
-
-

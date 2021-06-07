@@ -4,74 +4,12 @@ import random
 import logging
 import json
 from bson import json_util
+from backend_vars import TOPIC_LIST
 
 # implement threading for the podcast uploading
 logger = logging.getLogger("root")
 _SIZE = 20
 
-TOPIC_LIST = [
-    "Architecture",
-    "Remodeling",
-    "DIY",
-    "Garden stuff",
-    "Pop Culture",
-    "Music News",
-    "Actors",
-    "Tik Tok",
-    "K Pop",
-    "Economics",
-    "Stocks",
-    "Investing",
-    "Budgeting",
-    "Crypto",
-    "Retirement",
-    "Fitness",
-    "Healthy Living",
-    "Women's Health",
-    "Mens Health",
-    "Clean Eating",
-    "Sports",
-    "College Sports",
-    "Pro Sports",
-    "Football",
-    "Soccer",
-    "Hockey",
-    "BasketBall",
-    "Rugby",
-    "Surfing",
-    "Running",
-    "Golf",
-    "Tennis",
-    "Beauty",
-    "Skincare",
-    "Cleansing",
-    "Hair",
-    "Nails",
-    "Technology",
-    "Startups",
-    "Big Tech",
-    "Programming",
-    "Graphic Design",
-    "Big Tech",
-    "Programming",
-    "Graphic Design",
-    "Sports",
-    "Stocks",
-    "Surfing",
-    "Weather",
-    "Skincare",
-    "Cleansing",
-    "Crypto",
-    "Healthy Living",
-    "Healthy Living",
-    "DIY",
-    "Freelancing",
-    "Blogging",
-    "K Pop",
-    "Math",
-    "Cannabis",
-    "Golf",
-]
 
 
 class Podcast:

@@ -9,7 +9,7 @@ article_blueprint = Blueprint("article_blueprint", __name__)
 def article_list():
     if request.method == "POST":
         data = request.get_json()
-        articles = database_client.get_article_list(data["article_ids"])
+        articles = database_client.get_article_list(data["ids"])
 
         return {"result": articles}, 200
     return 404

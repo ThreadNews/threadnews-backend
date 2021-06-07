@@ -182,7 +182,6 @@ class Podcast:
             return {"message": "no articles possible"}, 404
 
         else:
-            print(payload)
             return payload
 
 

@@ -9,5 +9,6 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
+  - pwd; ls
   - black --check ***.py
-  - pytest test/*.py
+  - python -m pytest --cov-report term --cov=utils/ test/

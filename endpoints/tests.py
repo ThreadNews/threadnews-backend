@@ -7,7 +7,7 @@ test_blueprint = Blueprint("test_blueprint", __name__)
 
 @test_blueprint.route("/feed", methods=["GET"])
 def get_app_feed():
-    """ Get custom feed from NewsAPI and return it """
+    """Get custom feed from NewsAPI and return it"""
     if request.method == "GET":
         q = request.args.get("q")
         q_in_title = request.args.get("qInTitle")
@@ -37,7 +37,7 @@ def get_app_feed():
 
 @test_blueprint.route("/sources", methods=["GET"])
 def get_app_sources():
-    """ Get sources from NewsAPI and return it """
+    """Get sources from NewsAPI and return it"""
     log.info("trying to retrieve sources")
     if request.method == "GET":
         return appFeed.feed.get_sources()
@@ -45,14 +45,14 @@ def get_app_sources():
 
 @test_blueprint.route("/headlines", methods=["GET"])
 def get_app_headlines():
-    """ Get headlines from NewsAPI and return itoh yea """
+    """Get headlines from NewsAPI and return itoh yea"""
     if request.method == "GET":
         return appFeed.feed.get_headlines()
 
 
 @test_blueprint.route("/users", methods=["GET"])
 def get_users():
-    """ Get the users of ThreadNews """
+    """Get the users of ThreadNews"""
     if request.method == "GET":
         return jsonify(database_client.get_users()), 200
 

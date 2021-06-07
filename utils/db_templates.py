@@ -5,7 +5,7 @@ import text2emotion
 
 # file provides functions to create various database doccuments
 
-file = open("common_words.txt")
+file = open("data/common_words.txt")
 commons = file.read().replace("\t", " ").replace("\n", " ").split(" ")
 
 

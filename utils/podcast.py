@@ -5,7 +5,7 @@ import logging
 import json
 from bson import json_util
 
-# implement threading for the podcast uploading 
+# implement threading for the podcast uploading
 logger = logging.getLogger("root")
 _SIZE = 20
 
@@ -78,8 +78,8 @@ class Podcast:
     def create_a_list_of_all_podcasts(self, limit):
         all_podcasts = []
         for topic in TOPIC_LIST:
-            if limit >len(all_podcasts): 
-                break 
+            if limit > len(all_podcasts):
+                break
             shows = self.podcast_sp.search(q=topic, type="show")
             shows = shows["shows"]
             items = shows["items"]
@@ -154,9 +154,8 @@ class Podcast:
         inserted = 0
         podcasts = self.create_a_list_of_all_podcasts(limit)
 
-
         logger.info("trying to insert {} podcasts\n".format(len(podcasts)))
-        
+
         for podcast in podcasts:
             self.client.Podcasts.allPodcasts.insert_one(podcast)
             inserted += 1
@@ -164,8 +163,8 @@ class Podcast:
         # logger.info("inserted {} new  podcasts\n".format(inserted))
         return ({"msg": "success"}, 200)
 
-    def get_all_podcasts(self, q={}, page=1,limit=20):
-        """ Gets all the in a dictionary like way"""
+    def get_all_podcasts(self, q={}, page=1, limit=20):
+        """Gets all the in a dictionary like way"""
         logger.info(f"getting podcasts {q}: page number {page}")
         payload = json.loads(
             json.dumps(
@@ -183,5 +182,3 @@ class Podcast:
 
         else:
             return payload
-
-

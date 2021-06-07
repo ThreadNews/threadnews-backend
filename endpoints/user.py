@@ -23,7 +23,7 @@ def update_user_interests():
 @user_blueprint.route("/users", methods=["GET", "POST"])
 @jwt_required()
 def get_users():
-    """ Get the users of ThreadNews """
+    """Get the users of ThreadNews"""
     if request.method == "GET":
         return jsonify(database_client.get_users()), 200
     if request.method == "POST":

@@ -118,6 +118,6 @@ class NewsAPI:
         rand_topic = choice(TOPIC_LIST)
         data = self.feed.get_feed(q=rand_topic)["articles"]
         data += self.feed.get_headlines()["articles"]
-        formatted_articles = Article.convertToDataFrame(data, topic=rand_topic)
+        formatted_articles = Article.convert_to_dataframe(data, topic=rand_topic)
 
         return formatted_articles

@@ -55,8 +55,7 @@ class threadDatabase(User, Article, Podcast, SocialFeatures):
         #     "mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net"
         # )
 
-    @staticmethod
-    def user_template(user_name="", first_name="", last_name="", email="", interests=[]):
+    def user_template(self, user_name, email, first_name="", last_name="", interests=[]):
         """returns dictionary representing a user for creating new user document"""
         user = {
             "user_id": str(uuid.uuid1()),

@@ -51,7 +51,6 @@ def create_user_dataframe(data):
     email = valid_email(data["email"])
     password = data["password"]
 
-    print(email)
     if email is None:
         return {"msg": "invalid email"}, 400
 

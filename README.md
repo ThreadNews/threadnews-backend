@@ -1,14 +1,12 @@
-# threadnews-backend
+# threadnews-backend [![Build Status](https://www.travis-ci.com/ThreadNews/threadnews-backend.svg?branch=dev)](https://www.travis-ci.com/ThreadNews/threadnews-backend)
 
-This is the source code to the backend for ThreadNews web application developed for CSC 308/309. [![Build Status](https://www.travis-ci.com/ThreadNews/threadnews-backend.svg?branch=dev)](https://www.travis-ci.com/ThreadNews/threadnews-backend)
+This is the source code to the backend for ThreadNews web application developed for CSC 308/309. 
 
 ## Information
 
-Code Formatters Used: 
-Black  
+Code Formatters Used: Black  
 
 Developers should follow these instructions to set up [Black](https://dev.to/adamlombard/how-to-use-the-black-python-code-formatter-in-vscode-3lo0) formatting for VSCode
-
 
 ## Setup Guide
 

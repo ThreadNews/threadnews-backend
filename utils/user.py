@@ -34,6 +34,7 @@ class User:
     def get_user(self, q=""):
         """Retrieves users"""
         logger.info("getting users")
+        logger.info(q)
         return json.loads(
             json.dumps(list(self.client.Users.users.find(q)), default=json_util.default)
         )
@@ -48,6 +49,7 @@ class User:
         if len(self.get_user(q={"email": new_user["email"]})) != 0:
             return {"result": -1, "msg": "email exists"}
 
+        logger.info(type(new_user["user_name"]))
         if len(self.get_user(q={"user_name": new_user["user_name"]})) != 0:
             return {"result": -1, "msg": "username exists"}
 

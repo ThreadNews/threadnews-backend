@@ -1,7 +1,6 @@
 import json
 from bson import json_util
 import logging
-from email_validator import validate_email, EmailNotValidError
 
 logger = logging.getLogger("root")
 
@@ -175,10 +174,3 @@ class User:
 
         self.client.User.users.update_one({"user_id": user_id}, {"$set": new_info})
         return new_info
-
-    def valid_email(self, email=""):
-        try:
-            valid = validate_email(email)
-            return valid.email
-        except EmailNotValidError as e:
-            return None

@@ -25,4 +25,6 @@ def test_users_actions():
 # @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
     log.info("collecting articles")
-    database_client.push_new_articles(appFeed.begin_collection())
+    articles = appFeed.begin_collection()
+    if articles is not None:
+        database_client.push_new_articles(articles)

@@ -34,6 +34,6 @@ def test_get_feed(newsFeed):
     result = newsFeed.feed.get_feed(q=None)
     assert 400 in result
 
-def test_collection(newsFeed):
-    result = newsFeed.begin_collection()
-    assert result is not None
+# def test_collection(newsFeed):
+#     result = newsFeed.begin_collection()
+#     assert result is not None

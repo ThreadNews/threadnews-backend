@@ -2,6 +2,7 @@ from flask import request, Blueprint
 import bcrypt
 from flask_jwt_extended import create_access_token
 from backend_vars import database_client, log
+import utils.login as Login
 
 login_blueprint = Blueprint("login_blueprint", __name__)
 
@@ -34,35 +35,15 @@ def new_user():
     if request.method == "POST":
         log.info("new user")
         data = request.get_json(force=True)
-        username = None
-        email = None
-        password = None
+        
+        result = Login.create_user_dataframe(data)
+        if 200 not in result:
+            return result
 
-        if data:
-            if "username" in data:
-                username = data["username"]
-            else:
-                return {"msg": "username not found"}, 406
-
-            if "email" in data:
-                email = data["email"]
-            else:
-                return {"msg": "email not found"}, 406
-
-            if "password" in data:
-                password = data["password"]
-            else:
-                return {"msg": "password not found"}, 406
-
-        salt = bcrypt.gensalt()
-        pass_hash = bcrypt.hashpw(str.encode(password), salt)
-        log.info(type(username))
-        user = database_client.user_template(username, email)
-        user["pass_hash"] = pass_hash.decode()
-
+        user = result[0]["user"]
         log.info("successfully parsed new user information")
+        
         result = database_client.add_user(user)
-
         if result["result"] == -1:
             return {"msg": result["msg"]}, 404
 

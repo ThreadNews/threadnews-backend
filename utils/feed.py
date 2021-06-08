@@ -53,7 +53,7 @@ class NewsAPICalls:
 
         if r.status_code != 200:
             return {"error": "internal errorr"}, 500
-        return r.json()
+        return r.json(), 200
 
     def get_sources(self):
         """retrieves the current sources gathered from NewsAPI"""
@@ -61,7 +61,7 @@ class NewsAPICalls:
 
         if r.status_code != 200:
             return {"error": "internal errorr"}, 500
-        return r.json()
+        return r.json(), 200
 
     def get_feed(
         self,
@@ -104,7 +104,7 @@ class NewsAPICalls:
         r = self.get_requests(FEED, data=data)
         if r.status_code != 200:
             return {"error": "internal error"}, 500
-        return r.json()
+        return r.json(), 200
 
 
 class NewsAPI:
@@ -116,8 +116,16 @@ class NewsAPI:
         """current implementation makes use of hourly pull"""
         # todo: add more items to add articles to the database
         rand_topic = choice(TOPIC_LIST)
-        data = self.feed.get_feed(q=rand_topic)["articles"]
-        data += self.feed.get_headlines()["articles"]
+        feed = self.feed.get_feed(q=rand_topic)
+        if 200 not in feed:
+            return None
+
+        headlines = self.feed.get_headlines()
+        if 200 not in headlines:
+            return None
+
+        data = feed["articles"] + headlines["articles"]
         formatted_articles = Article.convert_to_dataframe(data, topic=rand_topic)
 
         return formatted_articles
+

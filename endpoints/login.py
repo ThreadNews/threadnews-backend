@@ -45,14 +45,17 @@ def new_user():
                 return {"msg": "username not found"}, 406
 
             if "email" in data:
-                email = data["email"]
+                email = database_client.valid_email(data["email"])
             else:
                 return {"msg": "email not found"}, 406
 
             if "password" in data:
                 password = data["password"]
             else:
-                return {"msg": "password not found"}, 406
+                return {"msg": "password not found"}, 406        
+
+        if email is None:
+            return {"msg": "invalid email"}, 400
 
         salt = bcrypt.gensalt()
         pass_hash = bcrypt.hashpw(str.encode(password), salt)

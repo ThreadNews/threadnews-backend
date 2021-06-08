@@ -52,7 +52,9 @@ def new_user():
             if "password" in data:
                 password = data["password"]
             else:
-                return {"msg": "password not found"}, 406        
+                return {"msg": "password not found"}, 406
+        else:
+            return {"msg": "missing data"}, 400    
 
         if email is None:
             return {"msg": "invalid email"}, 400

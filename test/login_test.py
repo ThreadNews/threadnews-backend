@@ -30,6 +30,10 @@ def test_verify_data_no_password(good_data):
     bad = good_data.copy().pop("password")
     assert 200 not in Login.verify_data(bad)
 
+def test_verify_data_no_data():
+    assert 200 not in Login.verify_data({})
+    assert 200 not in Login.verify_data(None)
+
 def test_user_dataframe(good_data):
     result = Login.create_user_dataframe(good_data)
     assert 200 in result

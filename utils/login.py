@@ -30,6 +30,9 @@ def valid_email(email=""):
 
 def verify_data(data):
     if data:
+        if len(data) == 0:
+            return {"msg": "missing data"}, 400 
+
         if "username" not in data:
             return {"msg": "username not found"}, 406
 

@@ -1,7 +1,9 @@
 from flask import request, Blueprint
 from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import logging
 
+logger = logging.getLogger('root')
 article_blueprint = Blueprint("article_blueprint", __name__)
 
 
@@ -25,7 +27,7 @@ def like_article():
     if data["action"] == "add":
         database_client.push_new_like(current_user["user_id"], data["id"])
     if data["action"] == "delete":
-        database_client.delete_like(data["user_id"], data["id"])
+        database_client.delete_like(current_user["user_id"], data["id"])
     return {"msg": "success"}, 200
 
 
@@ -36,10 +38,8 @@ def comment():
     data = request.get_json(force=True)
     user = get_jwt_identity()
 
-    add = True if data["add"] else False
-
     database_client.push_new_comment(
-        user["user_name"], data["article_id"], data["comment"], add=add
+        user["user_name"], data["article_id"], data["comment"]
     )
     return {"msg": "comment added"}, 200
 
@@ -55,7 +55,7 @@ def repost():
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
         database_client.repost_article(user["user_name"], data["id"], add=True)
-        return {"msg": "liked article"}, 200
+        return {"msg": "removed article"}, 200
     return {""}
 
 
@@ -69,7 +69,7 @@ def save_article():
         database_client.push_new_save(user["user_name"], data["id"])
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
-        database_client.delete_save(user["user_name"], data["id"], add=True)
+        database_client.delete_save(user["user_name"], data["id"])
         return {"msg": "removed liked article"}, 200
     return {""}
 

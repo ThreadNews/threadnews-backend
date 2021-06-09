@@ -51,7 +51,7 @@ def follow_user():
 
 @user_blueprint.route("/reccomended_follows", methods=["POST"])
 @jwt_required()
-def get_reccomended_follows():
+def get_recommended_follows():
     """returns a list of users the user may like to follow"""
     current_user = get_jwt_identity()
     print(current_user)

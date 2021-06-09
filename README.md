@@ -58,9 +58,29 @@ pytest test/
 pytest --cov-report term --cov=utils/ test/
 ```
 
+Current Coverage:
+
+```bash
+Name                       Stmts   Miss  Cover
+----------------------------------------------
+utils/__init__.py              0      0   100%
+utils/article.py             122     42    66%
+utils/config.py               53      8    85%
+utils/data.py                  1      0   100%
+utils/database.py             27      1    96%
+utils/feed.py                 83     15    82%
+utils/logger.py                9      0   100%
+utils/login.py                46      8    83%
+utils/podcast.py              58     33    43%
+utils/social_features.py      38     34    11%
+utils/user.py                 89     71    20%
+----------------------------------------------
+TOTAL                        526    212    60%
+```
+
 ## CI Management
 
-This project uses Travis CI to run a set of programs to ensure tests are working and code formatting is valid. Additionally, instead of using a configuration file, environmental variables are set within the travis application since the codes and passwords used in configuration are sensitive information for security purposes.
+This project uses Travis CI, [link](https://www.travis-ci.com/github/ThreadNews/threadnews-backend), to run a set of programs to ensure tests are working and code formatting is valid. Additionally, instead of using a configuration file, environmental variables are set within the travis application since the codes and passwords used in configuration are sensitive information for security purposes.
 
 In particular, the project runs all tests and reports whether any have failed as well as the coverage of the project. Furthermore, the CI runs a code formatting check with black to check for bad formatting of the code.
 

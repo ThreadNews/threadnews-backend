@@ -72,10 +72,10 @@ utils/feed.py                 83     15    82%
 utils/logger.py                9      0   100%
 utils/login.py                46      8    83%
 utils/podcast.py              58     33    43%
-utils/social_features.py      38     34    11%
+utils/social_features.py      38     15    61%
 utils/user.py                 89     71    20%
 ----------------------------------------------
-TOTAL                        526    212    60%
+TOTAL                        526    193    63%
 ```
 
 ## CI Management

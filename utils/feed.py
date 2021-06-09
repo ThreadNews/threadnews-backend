@@ -124,9 +124,7 @@ class NewsAPI:
         if 200 not in headlines:
             return None
 
-        print(feed)
-        data = feed[0]["articles"] + headlines[0]["articles"]
-        formatted_articles = Article.convert_to_dataframe(data, topic=rand_topic)
+        formatted_articles = Article.convert_to_dataframe(feed[0]["articles"], topic=rand_topic)
+        formatted_articles += Article.convert_to_dataframe(headlines[0]["articles"])
 
         return formatted_articles
-

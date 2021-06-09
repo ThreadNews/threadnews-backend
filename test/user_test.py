@@ -24,7 +24,7 @@ def test_get_user_list(database):
     test_user_in_list = user_list[0]
     assert test_user_in_list['_id'] == {'$oid': '6074689a6eda1bc92400f6b4'}
 
-def test(database): 
+def test_get_user_count(database): 
     user_count = database.get_user_count()
     assert user_count == 98 
 
@@ -37,5 +37,17 @@ def test_get_user_interests(database):
 def test_update_user_interests_none(database): 
     msg = database.update_user_interest('9ece6032-9ba4-11eb-a5a0-acde48001122')
     assert msg[0] == 200
+
+def test_update_user(database): 
+    new_info = database.update_user(user_id='9ece6032-9ba4-11eb-a5a0-acde48001122',
+        bio="hello",
+        first_name="Sally",
+        last_name="Dime",
+        profile_pic="None",
+        new_password="1234",
+        new_email="1234")
+
+    assert new_info is not None 
+
 
 

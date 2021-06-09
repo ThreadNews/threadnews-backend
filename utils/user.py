@@ -55,7 +55,7 @@ class User:
             return {"result": -1, "msg": "failed to inserted"}
 
     def get_user_count(self):
-        return self.client.Users.users.count
+        return self.client.Users.users.count()
 
     def get_user_interests(self, q="", interests=True):
         user = self.get_user(q)[0]
@@ -64,16 +64,17 @@ class User:
         return {"msg": "error"}
 
     def update_user_interest(self, user_id, add=None, remove=None):
-        if add:
+        msg = "user not added or removed"
+        if add: 
             self.client.Users.users.update_one(
-                {"user_id": user_id}, {"$push": {"interests": {"$each": add}}}
-            )
-
-        print(remove)
+                {"user_id": user_id}, {"$set": {"interests": {"$each": add}}})
+            msg = "user added"
         if remove:
             self.client.Users.users.update_one(
                 {"user_id": user_id}, {"$pull": {"interests": {"$in": remove}}}
             )
+            msg = "user removed"
+        return 200, {"msg": msg}
 
     def update_user(
         self,
@@ -121,31 +122,4 @@ class User:
             user_ls = list(user_ls.values())
         return self.get_user(q={"user_id": {"$in": user_ls}})
 
-    def update_bio(
-        self,
-        user_id,
-        bio="",
-        first_name="",
-        last_name="",
-        profile_pic="",
-        new_password="",
-        new_email="",
-    ):
-        """Updates user bio in user document"""
-        new_info = {}
-
-        if bio:
-            new_info["bio"] = bio
-        if first_name:
-            new_info["first_name"] = first_name
-        if last_name:
-            new_info["last_name"] = last_name
-        if profile_pic:
-            new_info["profile_pic"] = profile_pic
-        if new_password:
-            new_info["new_password"] = new_password
-        if new_email:
-            new_info["new_email"] = new_email
-
-        self.client.User.users.update_one({"user_id": user_id}, {"$set": new_info})
-        return new_info
+    

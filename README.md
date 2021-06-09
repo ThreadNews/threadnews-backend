@@ -4,7 +4,8 @@ This is the source code to the backend for ThreadNews web application developed 
 
 ## Information
 
-Code Formatters Used: Black  
++ Code Formatters Used: Black
++ Coding Style Guideline: PEP8
 
 Developers should follow these instructions to set up [Black](https://dev.to/adamlombard/how-to-use-the-black-python-code-formatter-in-vscode-3lo0) formatting for VSCode
 

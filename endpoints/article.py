@@ -54,7 +54,7 @@ def repost():
         database_client.repost_article(user["user_name"], data["id"])
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
-        database_client.repost_article(user["user_name"], data["id"], add=True)
+        database_client.repost_article(user["user_name"], data["id"], add=False)
         return {"msg": "removed article"}, 200
     return {""}
 

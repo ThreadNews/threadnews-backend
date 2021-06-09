@@ -1,6 +1,9 @@
 from email_validator import validate_email, EmailNotValidError
 import bcrypt
 import uuid
+import logging
+
+logger = logging.getLogger("root")
 
 def new_user_template(user_name, email, first_name="", last_name="", interests=[]):
     """returns dictionary representing a user for creating new user document"""
@@ -31,17 +34,22 @@ def valid_email(email=""):
 def verify_data(data):
     if data:
         if len(data) == 0:
+            logger.info("failed data verification")
             return {"msg": "missing data"}, 400 
 
         if "username" not in data:
+            logger.info("failed data verification")
             return {"msg": "username not found"}, 406
 
         if "email" not in data:
+            logger.info("failed data verification")
             return {"msg": "email not found"}, 406
 
         if "password" not in data:
+            logger.info("failed data verification")
             return {"msg": "password not found"}, 406
     else:
+        logger.info("no data to verify")
         return {"msg": "missing data"}, 400    
     return {"msg": 1}, 200
 
@@ -55,6 +63,7 @@ def create_user_dataframe(data):
     password = data["password"]
 
     if email is None:
+        logger.info("invalid email")
         return {"msg": "invalid email"}, 400
 
     salt = bcrypt.gensalt()

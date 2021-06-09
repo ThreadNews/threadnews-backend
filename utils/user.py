@@ -26,15 +26,12 @@ class User:
 
     def get_users(self):
         """Retrieves users"""
-        logger.info("getting users")
         return json.loads(
             json.dumps(list(self.client.Users.users.find()), default=json_util.default)
         )
 
     def get_user(self, q=""):
         """Retrieves users"""
-        logger.info("getting users")
-        logger.info(q)
         return json.loads(
             json.dumps(list(self.client.Users.users.find(q)), default=json_util.default)
         )
@@ -49,7 +46,6 @@ class User:
         if len(self.get_user(q={"email": new_user["email"]})) != 0:
             return {"result": -1, "msg": "email exists"}
 
-        logger.info(type(new_user["user_name"]))
         if len(self.get_user(q={"user_name": new_user["user_name"]})) != 0:
             return {"result": -1, "msg": "username exists"}
 
@@ -63,30 +59,9 @@ class User:
 
     def get_user_interests(self, q="", interests=True):
         user = self.get_user(q)[0]
-        print("USER:", user)
         if user["interests"] is not None and interests:
             return {"interests": user["interests"]}
         return {"msg": "error"}
-
-    def push_new_user(self, payload=None):
-
-        """Should be dealt with the login authentication"""
-        if payload is not None:
-            if (
-                self.Client.Users.users.find({"user_name": payload["user_name"]})
-                is not None
-            ):
-                logger.info("username already in use")
-            elif self.Client.Users.users.find({"email": payload["email"]}) is not None:
-                logger.info("email already in use")
-            else:
-                logger.info("adding new user")
-                self.Client.Users.users.insert_one(payload)
-                return 201
-            return 409
-        else:
-            logger.info("not possible to add user")
-            return 500
 
     def update_user_interest(self, user_id, add=None, remove=None):
         if add:

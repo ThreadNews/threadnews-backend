@@ -24,13 +24,12 @@ def create_app():
     app.register_blueprint(login_blueprint)
     app.register_blueprint(front_blueprint)
     app.register_blueprint(article_blueprint)
-    app.register_blueprint(test_blueprint)  # for testing
+    # app.register_blueprint(test_blueprint)  # for testing
     app.register_blueprint(user_blueprint)
     jwt = JWTManager(app)
     from endpoints import tasks
 
     scheduler.api_enabled = True
-    # scheduler.init_app(app)
 
     scheduler.add_job(func=tasks.feed_worker, trigger="interval", seconds=POLL_INTERVAL)
     scheduler.add_job(

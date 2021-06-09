@@ -19,6 +19,7 @@ class Article:
             article_data ([dict]): list of dictionaries that represent the dataframe
             topic (str, optional): topic of the articles. Defaults to "".
         """
+
         def convertor(article):
             unique_bytes = ""
             if article["author"]:
@@ -103,7 +104,7 @@ class Article:
         return 200
 
     def repost_article(self, user_id, article_id, add=True):
-        """ reposts an article """
+        """reposts an article"""
         op = "$push" if add else "$pull"
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -119,7 +120,7 @@ class Article:
         return 200
 
     def remove_likes_articles(self, user_id, article_id):
-        """ remove likes from an article id and on the user id """
+        """remove likes from an article id and on the user id"""
         self.client.Users.users.update_one(
             {"user_id": user_id},
             {
@@ -134,7 +135,7 @@ class Article:
         return 200
 
     def push_new_comment(self, user_name, article_id, comment):
-        """ add comment to user document(comment, article_id) """
+        """add comment to user document(comment, article_id)"""
         self.client.Users.users.update_one(
             {"id": article_id},
             {"$push": {"comments": {"comment": comment, "user_name": user_name}}},
@@ -147,7 +148,7 @@ class Article:
         return 200
 
     def push_new_articles(self, articles):
-        """ inserts new articles to database """
+        """inserts new articles to database"""
         inserted = 0
         logger.info("trying to insert {} articles".format(len(articles)))
         for article in articles:
@@ -162,7 +163,7 @@ class Article:
         return ({"msg": "success"}, 200)
 
     def push_new_like(self, user_id, article_id):
-        """ adds a new like to article id and user id """
+        """adds a new like to article id and user id"""
         # add like article document
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -179,7 +180,7 @@ class Article:
         return 200
 
     def push_new_view(self, user_id, article_id):
-        """ adds viewed article id to user id """
+        """adds viewed article id to user id"""
         # stores article id, headline, sentiment in user object
         article_data = self.get_article_by_id(article_id)
         article_data["date"] = time.time()
@@ -189,7 +190,7 @@ class Article:
         return 200, "success"
 
     def push_new_save(self, user_id, article_id):
-        """ add saved article id to user information """
+        """add saved article id to user information"""
         # add save to user doccument
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -206,7 +207,7 @@ class Article:
         return "success", 200
 
     def delete_save(self, user_id, article_id):
-        """ delete a saved article id from the user """ 
+        """delete a saved article id from the user"""
         # add save to user doccument
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -223,7 +224,7 @@ class Article:
         return 200
 
     def delete_like(self, user_id, article_id):
-        """ removes user's like from an article """
+        """removes user's like from an article"""
         # add like article document
         self.client.Users.users.update_one(
             {"user_id": user_id}, {"$pull": {"liked_articles": article_id}}
@@ -235,7 +236,7 @@ class Article:
         return 200
 
     def get_article_list(self, article_ids, n=10):
-        """ gets like of a list of articles """
+        """gets like of a list of articles"""
         article_ls = []
         cur = self.client.Articles.allArticles.find(
             {"id": {"$in": list(article_ids)}}

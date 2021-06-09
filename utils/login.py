@@ -77,7 +77,7 @@ def create_user_dataframe(data):
     """helper to create a user dataframe from inputted data
 
     Args:
-        data (dict): data input of new user information 
+        data (dict): data input of new user information
 
     Returns:
         message, int: returns a message or the user information and http code

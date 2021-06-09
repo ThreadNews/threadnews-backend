@@ -6,14 +6,14 @@ logger = logging.getLogger("root")
 
 
 class threadConfiguration:
-    """ gets configuration for program """
+    """gets configuration for program"""
 
     def __init__(self):
         self.config = configparser.ConfigParser()
         self.read_from_config_file()
 
     def read_from_config_file(self):
-        """ reads configuration from file """
+        """reads configuration from file"""
 
         if not os.path.exists(".config/api.conf"):
             if not os.path.exists(".config"):
@@ -31,7 +31,7 @@ class threadConfiguration:
                 config_file.close()
                 logger.critical("missing data/env vars, please add to .config/api.conf")
         else:
-            """ only if configuration file is found """
+            """only if configuration file is found"""
             logger.info("configuration found")
             self.config.read(".config/api.conf")
 
@@ -71,11 +71,11 @@ class threadConfiguration:
         return None in [api_key, url, user, password, jwt_secret]
 
     def get_configuration(self):
-        """ returns the configuration file """
+        """returns the configuration file"""
         return self.config
 
     def get_api_keys(self):
-        """ gets the api key(s) """
+        """gets the api key(s)"""
         api_key = self.config["NewsAPI"]["key"]
         if "," in api_key:
             return [key.strip() for key in api_key.split(",")]

@@ -59,7 +59,7 @@ def get_users():
 
 @test_blueprint.route("/articles", methods=["GET"])
 def get_articles():
-    """ get articles """
+    """get articles"""
     if request.method == "GET":
         pages = request.args.get("pages")
         if pages is None:
@@ -70,7 +70,7 @@ def get_articles():
 @test_blueprint.route("/protected", methods=["GET"])
 @jwt_required()
 def protected():
-    """ test endpoint """
+    """test endpoint"""
     # Access the identity of the current user with get_jwt_identity
     current_user = get_jwt_identity()
     return {"logged_in_as": current_user}, 200

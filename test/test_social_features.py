@@ -2,6 +2,7 @@ import pytest
 from utils.database import threadDatabase
 from utils.config import threadConfiguration
 import collections
+
 TEST_USER_ID1 = "0e7bf4b8-7c28-11eb-95d3-acde48001122"
 TEST_USER_ID2 = "98200178-781d-11eb-b6dc-acde48001122"
 TEST_USER_ID3 = "3296fe3a-7c53-11eb-95d3-acde48001122"
@@ -42,5 +43,3 @@ def test_unfollow_user(db):
     # confirm if user1  not is following user 2
     result = db.fetch_social(TEST_USER_ID1, following=True)
     assert TEST_USER_ID2 not in result["result"]["following"]
-
-

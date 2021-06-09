@@ -9,7 +9,7 @@ def newsFeed():
 
 
 def test_rotate(newsFeed):
-    """ Test api rotation """
+    """Test api rotation"""
     if isinstance(newsFeed.api_key, list):
         currentApi = newsFeed.api_key[0]
         assert newsFeed.feed._rotate_api() == currentApi

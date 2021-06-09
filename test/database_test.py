@@ -8,6 +8,7 @@ import sys, os
 Test database functionality
 """
 
+
 @pytest.fixture
 def database():
     return threadDatabase(threadConfiguration().get_configuration())

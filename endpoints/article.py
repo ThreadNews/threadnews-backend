@@ -69,7 +69,7 @@ def save_article():
         database_client.push_new_save(user["user_name"], data["id"])
         return {"msg": "liked article"}, 200
     elif data["action"] == "remove":
-        database_client.delete_save(user["user_name"], data["id"], add=True)
+        database_client.delete_save(user["user_name"], data["id"])
         return {"msg": "removed liked article"}, 200
     return {""}
 

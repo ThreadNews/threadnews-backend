@@ -94,4 +94,3 @@ def update_user_bio():
     if request.method == "POST":
         data = request.get_json(force=True)
         current_user = get_jwt_identity()
-

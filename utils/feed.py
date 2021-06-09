@@ -41,7 +41,7 @@ class NewsAPICalls:
             data = {"apiKey": self._rotate_api()}
         else:
             data["apiKey"] = self._rotate_api()
-        
+
         try:
             return requests.get(url, params=data)
         except:
@@ -124,7 +124,9 @@ class NewsAPI:
         if 200 not in headlines:
             return None
 
-        formatted_articles = Article.convert_to_dataframe(feed[0]["articles"], topic=rand_topic)
+        formatted_articles = Article.convert_to_dataframe(
+            feed[0]["articles"], topic=rand_topic
+        )
         formatted_articles += Article.convert_to_dataframe(headlines[0]["articles"])
 
         return formatted_articles

@@ -3,7 +3,7 @@ from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import logging
 
-logger = logging.getLogger('root')
+logger = logging.getLogger("root")
 article_blueprint = Blueprint("article_blueprint", __name__)
 
 
@@ -38,9 +38,7 @@ def comment():
     data = request.get_json(force=True)
     user = get_jwt_identity()
 
-    database_client.push_new_comment(
-        user["user_name"], data["id"], data["comment"]
-    )
+    database_client.push_new_comment(user["user_name"], data["id"], data["comment"])
     return {"msg": "comment added"}, 200
 
 

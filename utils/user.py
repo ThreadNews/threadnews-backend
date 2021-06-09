@@ -1,3 +1,10 @@
+import json
+from bson import json_util
+import logging
+
+logger = logging.getLogger("root")
+
+
 class User:
     def get_user_list(self, user_ls):
         if type(user_ls) == dict:
@@ -12,25 +19,20 @@ class User:
             del user["_id"]
 
             if "user_name" in user.keys():
-                # print("user:", user )
-                print("username", user["user_name"])
-
                 if search_string in user["user_name"]:
-                    print("found:", user)
-
                     list_of_users_to_display.append(user)
 
         return list_of_users_to_display
 
     def get_users(self):
-        """ Retrieves users """
+        """Retrieves users"""
         logger.info("getting users")
         return json.loads(
             json.dumps(list(self.client.Users.users.find()), default=json_util.default)
         )
 
     def get_user(self, q=""):
-        """ Retrieves users """
+        """Retrieves users"""
         logger.info("getting users")
         return json.loads(
             json.dumps(list(self.client.Users.users.find(q)), default=json_util.default)
@@ -39,11 +41,6 @@ class User:
     def search_user(self, search_string):
         q = {"username": "/.*" + search_string + ".*/"}
         return self.get_substring_search_results(search_string)
-        # users = self.client.Users.users.find({"username": "/a/i"});
-        # user_ls = []
-        # for user in users[:5]:
-        #     user_ls.append(user)
-        # return user_ls
 
     def add_user(self, new_user=None):
         logger.info("trying to add new user")
@@ -71,7 +68,7 @@ class User:
 
     def push_new_user(self, payload=None):
 
-        """ Should be dealt with the login authentication """
+        """Should be dealt with the login authentication"""
         if payload is not None:
             if (
                 self.Client.Users.users.find({"user_name": payload["user_name"]})
@@ -111,7 +108,7 @@ class User:
         new_password="",
         new_email="",
     ):
-        """ Updates user bio in user document """
+        """Updates user bio in user document"""
         new_info = {}
         if bio:
             new_info["bio"] = bio
@@ -157,7 +154,7 @@ class User:
         new_password="",
         new_email="",
     ):
-        """ Updates user bio in user document """
+        """Updates user bio in user document"""
         new_info = {}
 
         if bio:

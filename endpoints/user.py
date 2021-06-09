@@ -1,7 +1,7 @@
 from flask import request, Blueprint
 from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
-import jsonify
+
 
 user_blueprint = Blueprint("user_blueprint", __name__)
 
@@ -23,7 +23,7 @@ def update_user_interests():
 @user_blueprint.route("/users", methods=["GET", "POST"])
 @jwt_required()
 def get_users():
-    """ Get the users of ThreadNews """
+    """Get the users of ThreadNews"""
     if request.method == "GET":
         return jsonify(database_client.get_users()), 200
     if request.method == "POST":

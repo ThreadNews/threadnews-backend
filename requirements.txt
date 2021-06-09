@@ -50,3 +50,4 @@ Flask-APScheduler==1.12.1
 gunicorn>=20.1.0
 black>=21.5b0
 spotipy
+pytest-cov>=2.12.1

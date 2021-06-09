@@ -54,5 +54,3 @@ class threadDatabase(User, Article, Podcast, SocialFeatures):
         # self.client = MongoClient(
         #     "mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net"
         # )
-
-

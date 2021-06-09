@@ -91,6 +91,7 @@ def search_user():
 @user_blueprint.route("/edit_profile", methods=["POST"])
 @jwt_required()
 def update_user_bio():
+    """ updates user bio endpoint """
     if request.method == "POST":
         data = request.get_json(force=True)
         current_user = get_jwt_identity()

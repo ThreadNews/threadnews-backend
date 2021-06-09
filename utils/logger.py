@@ -2,6 +2,7 @@ import logging
 
 
 def setup_logger(name):
+    """ sets up the global logger """
     formatter = logging.Formatter(
         fmt="%(asctime)s - %(levelname)s - %(module)s - %(message)s"
     )

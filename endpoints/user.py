@@ -29,9 +29,12 @@ def get_users():
     if request.method == "POST":
         current_user = get_jwt_identity()
         data = request.get_json(force=True)
-        users = database_client.get_user_list(data["user_ids"])
-        print("USERS:", users)
-        return {"result": users}, 200
+        try:
+            users = database_client.get_user_list(data["user_ids"])
+            print("USERS:", users)
+            return {"result": users}, 200
+        except:
+            return {"result": []}
 
 
 @user_blueprint.route("/follow_user", methods=["POST"])

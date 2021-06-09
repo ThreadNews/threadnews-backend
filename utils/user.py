@@ -116,11 +116,6 @@ class User:
             )
         return 200
 
-    def get_user_list(self, user_ls):
-        if type(user_ls) == dict:
-            user_ls = list(user_ls.values())
-        return self.get_user(q={"user_id": {"$in": user_ls}})
-
     def update_bio(
         self,
         user_id,

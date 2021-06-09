@@ -27,3 +27,22 @@ def test_get_user_list(database):
 def test(database): 
     user_count = database.get_user_count()
     assert user_count == 98 
+
+
+def test_get_user_interests(database): 
+    user_interests = database.get_user_interests({'user_id': '9ece6032-9ba4-11eb-a5a0-acde48001122'})
+    interests = set(user_interests.get("interests"))
+    assert interests == {'Skincare', 'Healthy Living', 'Crypto', 'Cleansing', 'Cars', 'DIY', 'Health', 'Big Tech'}
+
+def test_update_user_interests_none(database): 
+    msg = database.update_user_interest('9ece6032-9ba4-11eb-a5a0-acde48001122')
+    assert msg[0] == 200
+
+def test_update_user_interests_add(database): 
+    add = {'user_id': '9ece6032-9ba4-11eb-a5a0-acde48001122', 'user_name': 'gb', 'first_name': 'dfsf', 'last_name': 'asfs', 'email': 'gb@gmail.com'}
+    msg = database.update_user_interest('9ece6032-9ba4-11eb-a5a0-acde48001122', add=['Skincare', 'Healthy Living'])
+    assert msg[0] == 200
+
+def test_update_user_interests_remove(database): 
+    msg = database.update_user_interest('9ece6032-9ba4-11eb-a5a0-acde48001122', remove=True)
+    assert msg[0] == 200

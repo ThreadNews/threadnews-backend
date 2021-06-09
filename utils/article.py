@@ -66,22 +66,6 @@ class Article:
         for article in articles:
             return article
 
-    def push_new_headlines(self, max=50):
-        feed = NewsAPICalls(self.config)
-        headlines = feed.get_headlines()
-        print(headlines.keys())
-        i = 0
-        for article in headlines["articles"]:
-            # print(article.get_json())
-            if i < max:
-                article["id"] = str(uuid.uuid4()).strip("-")
-                article["global_score"] = 50
-                article["main_topic"] = ""
-                article["tags"] = {}
-                # self.client.Articles.allArticles.insert_one(article)
-                i += 1
-        {"msg": "success"}
-
     def add_likes_articles(self, user_id, article_id):
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -97,7 +81,7 @@ class Article:
         return 200
 
     def repost_article(self, user_id, article_id, add=True):
-        op = "$push" if not add else "$pull"
+        op = "$push" if add else "$pull"
         self.client.Users.users.update_one(
             {"user_id": user_id},
             {
@@ -107,7 +91,7 @@ class Article:
             },
         )
         self.client.Articles.allArticles.update_one(
-            {"id": article_id}, {"$inc": {"reposts": 1}}
+            {"id": article_id}, {"$inc": {"reposts": 1 if op is "$pull" else -1}}
         )
         return 200
 

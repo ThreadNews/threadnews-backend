@@ -58,14 +58,6 @@ def get_recommended_follows():
     data = request.get_json(force=True)
     users = database_client.get_user_list(current_user["suggested_follows"])
     return {"result": users}
-    # following = True if 'following' in current_user.keys() else False
-    # if following:
-    #     reccomended_users = database_client.fetch_reccomended_social(current_user['user_id'],N=data['N'])
-    #     return {'reccomended_users':'hey'},200
-
-    # return reccomended_users,200
-
-    return {"msg": "error no users found"}, 407
 
 
 @user_blueprint.route("/edit_profile", methods=["POST"])
@@ -100,13 +92,3 @@ def update_user_bio():
         data = request.get_json(force=True)
         current_user = get_jwt_identity()
 
-    # get the info from each field store it so its attached to the user
-    # shows up everytime
-
-    # NEW (?) fields for user data base
-    # first name **
-    # last name **
-    # profile pic
-    # bio
-    # password **
-    # email **

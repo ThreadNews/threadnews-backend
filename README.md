@@ -80,7 +80,7 @@ TOTAL                        526    212    60%
 
 ## CI Management
 
-This project uses Travis CI, [link](https://www.travis-ci.com/github/ThreadNews/threadnews-backend) to run a set of programs to ensure tests are working and code formatting is valid. Additionally, instead of using a configuration file, environmental variables are set within the travis application since the codes and passwords used in configuration are sensitive information for security purposes.
+This project uses Travis CI, [link](https://www.travis-ci.com/github/ThreadNews/threadnews-backend), to run a set of programs to ensure tests are working and code formatting is valid. Additionally, instead of using a configuration file, environmental variables are set within the travis application since the codes and passwords used in configuration are sensitive information for security purposes.
 
 In particular, the project runs all tests and reports whether any have failed as well as the coverage of the project. Furthermore, the CI runs a code formatting check with black to check for bad formatting of the code.
 

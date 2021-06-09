@@ -1,4 +1,4 @@
-from backend_vars import scheduler, log, appFeed, database_client
+from backend_vars import log, appFeed, database_client
 
 
 test_user_ids = [

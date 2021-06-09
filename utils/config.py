@@ -1,7 +1,6 @@
 import configparser
 import logging
 import os
-import json
 
 logger = logging.getLogger("root")
 

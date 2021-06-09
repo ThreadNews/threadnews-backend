@@ -1,12 +1,9 @@
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 import random
 import logging
 import json
 from bson import json_util
 from utils.data import TOPIC_LIST
 
-# implement threading for the podcast uploading
 logger = logging.getLogger("root")
 _SIZE = 20
 

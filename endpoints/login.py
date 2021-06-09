@@ -47,6 +47,7 @@ def new_user():
         if result["result"] == -1:
             return {"msg": result["msg"]}, 404
 
+        log.info("successfully added new user")
         # clean up user data for less exposure
         user.pop("_id", None)
         user.pop("pass_hash", None)

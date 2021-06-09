@@ -114,7 +114,6 @@ class NewsAPI:
 
     def begin_collection(self):
         """current implementation makes use of hourly pull"""
-        # todo: add more items to add articles to the database
         rand_topic = choice(TOPIC_LIST)
         feed = self.feed.get_feed(q=rand_topic)
         if 200 not in feed:

@@ -1,6 +1,9 @@
 import pytest
 from utils.config import threadConfiguration
 
+"""
+Test if API keys are working and gathered
+"""
 
 @pytest.fixture
 def config():

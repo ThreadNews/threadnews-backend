@@ -9,6 +9,7 @@ login_blueprint = Blueprint("login_blueprint", __name__)
 
 @login_blueprint.route("/login", methods=["POST"])
 def try_login():
+    """ login to application, returns a jwt token """
     if request.method == "POST":
         log.info("trying to login")
         data = request.get_json(force=True)
@@ -32,6 +33,7 @@ def try_login():
 
 @login_blueprint.route("/newUser", methods=["POST"])
 def new_user():
+    """ new users route, tries to add new users """
     if request.method == "POST":
         log.info("new user")
         data = request.get_json(force=True)

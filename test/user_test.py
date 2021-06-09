@@ -24,3 +24,9 @@ def test_get_user_list(database):
     test_user_in_list = user_list[0]
     assert test_user_in_list['_id'] == {'$oid': '6074689a6eda1bc92400f6b4'}
 
+def test(database): 
+    user_count = database.get_user_list()
+    print("\nSTART\n")
+    print(user_count)
+    print("\nEND\n")
+    assert False == True

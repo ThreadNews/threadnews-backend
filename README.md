@@ -79,6 +79,8 @@ utils/user.py                 89     71    20%
 TOTAL                        526    193    63%
 ```
 
+AS seen, we were able to test more than 60% of utilities classes; however, this doesn't include endpoints as those tests are ran on cypress in the frontend.
+
 ## CI Management
 
 This project uses Travis CI, [link](https://www.travis-ci.com/github/ThreadNews/threadnews-backend), to run a set of programs to ensure tests are working and code formatting is valid. Additionally, instead of using a configuration file, environmental variables are set within the travis application since the codes and passwords used in configuration are sensitive information for security purposes.

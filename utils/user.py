@@ -7,11 +7,13 @@ logger = logging.getLogger("root")
 
 class User:
     def get_user_list(self, user_ls):
+        """gets a user information from ids"""
         if type(user_ls) == dict:
             user_ls = list(user_ls.values())
         return self.get_user(q={"user_id": {"$in": user_ls}})
 
     def get_substring_search_results(self, search_string):
+        """searching users by substring"""
         list_of_users_to_display = []
         print("starting ...")
         users = self.client.Users.users.find()
@@ -37,10 +39,12 @@ class User:
         )
 
     def search_user(self, search_string):
+        """searches for a user"""
         q = {"username": "/.*" + search_string + ".*/"}
         return self.get_substring_search_results(search_string)
 
     def add_user(self, new_user=None):
+        """adds new user to database"""
         logger.info("trying to add new user")
 
         if len(self.get_user(q={"email": new_user["email"]})) != 0:
@@ -58,6 +62,7 @@ class User:
         return self.client.Users.users.count
 
     def get_user_interests(self, q="", interests=True):
+        """get users interest"""
         user = self.get_user(q)[0]
         if user["interests"] is not None and interests:
             return {"interests": user["interests"]}
@@ -106,6 +111,7 @@ class User:
         return new_info
 
     def update_interests(self, user_id, interests, remove=False):
+        """updates a users interests"""
         op = "$push" if not remove else "$pull"
         for interest in interests:
             self.client.Users.users.update_one(
@@ -115,11 +121,6 @@ class User:
                 {op: {"interests": interest}},
             )
         return 200
-
-    def get_user_list(self, user_ls):
-        if type(user_ls) == dict:
-            user_ls = list(user_ls.values())
-        return self.get_user(q={"user_id": {"$in": user_ls}})
 
     def update_bio(
         self,

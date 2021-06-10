@@ -1,4 +1,4 @@
-from backend_vars import scheduler, log, appFeed, database_client
+from backend_vars import log, appFeed, database_client
 
 
 test_user_ids = [
@@ -24,6 +24,7 @@ def test_users_actions():
 
 # @scheduler.task('interval', id='feed_collector', seconds=POLL_INTERVAL)
 def feed_worker():
+    """interval task for collecting articles to add to backend"""
     log.info("collecting articles")
     articles = appFeed.begin_collection()
     if articles is not None:

@@ -1,13 +1,6 @@
 from pymongo import MongoClient
-from bson import json_util
-import uuid
-import json
 import logging
 import certifi
-import time
-import collections
-from operator import itemgetter
-import random
 from utils.user import User
 from utils.social_features import SocialFeatures
 from utils.article import Article
@@ -16,7 +9,6 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 logger = logging.getLogger("root")
-_SIZE = 20
 
 
 class threadDatabase(User, Article, Podcast, SocialFeatures):
@@ -54,5 +46,3 @@ class threadDatabase(User, Article, Podcast, SocialFeatures):
         # self.client = MongoClient(
         #     "mongodb+srv://thread-admin:dontThr3adOnM3@cluster0.n4ur2.mongodb.net"
         # )
-
-

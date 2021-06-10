@@ -4,8 +4,8 @@ This is the source code to the backend for ThreadNews web application developed 
 
 ## Information
 
-+ Code Formatters Used: Black
-+ Coding Style Guideline: PEP8
++ Code Formatters Used: **Black**
++ Coding Style Guideline: **PEP8**
 
 Developers should follow these instructions to set up [Black](https://dev.to/adamlombard/how-to-use-the-black-python-code-formatter-in-vscode-3lo0) formatting for VSCode
 
@@ -78,6 +78,8 @@ utils/user.py                 89     71    20%
 ----------------------------------------------
 TOTAL                        526    193    63%
 ```
+
+AS seen, we were able to test more than 60% of utilities classes; however, this doesn't include endpoints as those tests are ran on cypress in the frontend.
 
 ## CI Management
 

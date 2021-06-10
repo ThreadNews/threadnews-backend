@@ -41,7 +41,7 @@ class NewsAPICalls:
             data = {"apiKey": self._rotate_api()}
         else:
             data["apiKey"] = self._rotate_api()
-        
+
         try:
             return requests.get(url, params=data)
         except:
@@ -114,7 +114,6 @@ class NewsAPI:
 
     def begin_collection(self):
         """current implementation makes use of hourly pull"""
-        # todo: add more items to add articles to the database
         rand_topic = choice(TOPIC_LIST)
         feed = self.feed.get_feed(q=rand_topic)
         if 200 not in feed:
@@ -124,7 +123,9 @@ class NewsAPI:
         if 200 not in headlines:
             return None
 
-        formatted_articles = Article.convert_to_dataframe(feed[0]["articles"], topic=rand_topic)
+        formatted_articles = Article.convert_to_dataframe(
+            feed[0]["articles"], topic=rand_topic
+        )
         formatted_articles += Article.convert_to_dataframe(headlines[0]["articles"])
 
         return formatted_articles

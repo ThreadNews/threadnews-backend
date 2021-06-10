@@ -4,6 +4,10 @@ from utils.config import threadConfiguration
 from utils.database import threadDatabase
 import sys, os
 
+"""
+Test database functionality
+"""
+
 
 @pytest.fixture
 def database():

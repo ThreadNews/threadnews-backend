@@ -11,7 +11,6 @@ if [[ $# -eq 2 && $2 == "-r" ]]; then
     NO_RELOAD="--no-reload"
 fi
 
-echo "Application is going live"
 export FLASK_APP=$1
 export FLASK_ENV=development
 flask run $NO_RELOAD

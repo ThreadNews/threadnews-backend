@@ -35,14 +35,14 @@ def new_user():
     if request.method == "POST":
         log.info("new user")
         data = request.get_json(force=True)
-        
+
         result = Login.create_user_dataframe(data)
         if 200 not in result:
             return result
 
         user = result[0]["user"]
         log.info("successfully parsed new user information")
-        
+
         result = database_client.add_user(user)
         if result["result"] == -1:
             return {"msg": result["msg"]}, 404

@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger("root")
 
+
 def new_user_template(user_name, email, first_name="", last_name="", interests=[]):
     """returns dictionary representing a user for creating new user document"""
     user = {
@@ -24,6 +25,7 @@ def new_user_template(user_name, email, first_name="", last_name="", interests=[
     }
     return user
 
+
 def valid_email(email=""):
     try:
         valid = validate_email(email)
@@ -31,11 +33,12 @@ def valid_email(email=""):
     except EmailNotValidError as e:
         return None
 
+
 def verify_data(data):
     if data:
         if len(data) == 0:
             logger.info("failed data verification")
-            return {"msg": "missing data"}, 400 
+            return {"msg": "missing data"}, 400
 
         if "username" not in data:
             logger.info("failed data verification")
@@ -50,14 +53,15 @@ def verify_data(data):
             return {"msg": "password not found"}, 406
     else:
         logger.info("no data to verify")
-        return {"msg": "missing data"}, 400    
+        return {"msg": "missing data"}, 400
     return {"msg": 1}, 200
+
 
 def create_user_dataframe(data):
     verification = verify_data(data)
     if 200 not in verification:
         return verification
-    
+
     username = data["username"]
     email = valid_email(data["email"])
     password = data["password"]

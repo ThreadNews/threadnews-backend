@@ -31,12 +31,14 @@ class Article:
             return [convertor(article) for article in article_data]
         return [convertor(article_data)]
 
-    def get_random_article(self):
+    def get_random_article(self, random_num=None):
         """Gets random article (used for test users)"""
+        if random_num is None: 
+            random_num = int(random.randint(0, 50))
         article = dict(
             self.client.Articles.allArticles.find()
             .limit(-1)
-            .skip(int(random.randint(0, 50)))
+            .skip(random_num)
             .next()
         )
         del article["_id"]
@@ -59,12 +61,18 @@ class Article:
         if len(payload) == 0:
             return {"message": "no articles possible"}, 404
 
-        return 200
+        return {"message": "Articles Found"}, 200
 
     def get_article_by_id(self, article_id):
         articles = self.client.Articles.allArticles.find({"id": article_id})
         for article in articles:
             return article
+
+    def get_user_by_id(self, user_id):
+        users = self.client.Users.users.find({"user_id": user_id})
+        for user in users:
+            return user 
+
 
     def add_likes_articles(self, user_id, article_id):
         self.client.Users.users.update_one(

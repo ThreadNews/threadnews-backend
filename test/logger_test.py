@@ -1,6 +1,7 @@
 import pytest
 import utils.logger as logger
 
+
 """
 Test if logger is being created
 """

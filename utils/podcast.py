@@ -10,6 +10,16 @@ _SIZE = 20
 
 class Podcast:
     def create_a_list_of_all_podcasts(self, limit):
+        """
+        Description: Creates a list of podcasts under a certain limit 
+
+        Params:
+            limit (int) = how many podcasts will be returned
+
+        Returns:
+            podcast_list (list of Podcasts) = list of podcasts within user interest range
+        """
+        
         all_podcasts = []
         for topic in TOPIC_LIST:
             if limit > len(all_podcasts):
@@ -65,7 +75,10 @@ class Podcast:
         return podcast_list
 
     def get_random_indexes(self, count, range):
-        """ "
+        """"
+        Description: Gets a random indexes within a range 
+        to randomize podcast selection from API 
+
         Params:
             count (int) = how many random ints returned
             range (int) = what is the highest # the random int can be (0 - range)
@@ -85,6 +98,15 @@ class Podcast:
         return index_list
 
     def push_new_podcasts(self, limit=700):
+        """"
+        Description: Puts new podcasts in the database 
+        
+        Params:
+            limit (int) = how many podcasts will pushed 
+
+        Returns:
+            Return dict = 200 message for success 
+        """
         inserted = 0
         podcasts = self.create_a_list_of_all_podcasts(limit)
 
@@ -98,7 +120,15 @@ class Podcast:
         return ({"msg": "success"}, 200)
 
     def get_all_podcasts(self, q={}, page=1, limit=20):
-        """Gets all the in a dictionary like way"""
+        """"
+        Description: Gets podcasts from the database 
+        
+        Params:
+            q (dict) = database query 
+
+        Returns:
+            Return dict = response from database 
+        """
         logger.info(f"getting podcasts {q}: page number {page}")
         payload = json.loads(
             json.dumps(

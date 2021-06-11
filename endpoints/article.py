@@ -38,7 +38,9 @@ def comment():
     data = request.get_json(force=True)
     user = get_jwt_identity()
 
-    database_client.push_new_comment(user["user_name"], data["id"], data["comment"])
+    database_client.push_new_comment(
+        user["user_name"], data["id"], data["comment"]
+    )
     return {"msg": "comment added"}, 200
 
 

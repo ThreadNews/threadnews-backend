@@ -13,6 +13,13 @@ _SIZE = 20
 class Article:
     @staticmethod
     def convert_to_dataframe(article_data, topic=""):
+        """converts articles to database dataframe
+
+        Args:
+            article_data ([dict]): list of dictionaries that represent the dataframe
+            topic (str, optional): topic of the articles. Defaults to "".
+        """
+
         def convertor(article):
             unique_bytes = ""
             if article["author"]:
@@ -46,7 +53,15 @@ class Article:
         return article
 
     def get_articles(self, q={}, page=1):
-        """Retrieves articles"""
+        """retrieves articles
+
+        Args:
+            q (dict, optional): query. Defaults to {}.
+            page (int, optional): page number. Defaults to 1.
+
+        Returns:
+            dict, int: represents the message and http number
+        """
         logger.info(f"getting articles {q}: page number {page}")
         payload = json.loads(
             json.dumps(
@@ -64,6 +79,14 @@ class Article:
         return {"message": "Articles Found"}, 200
 
     def get_article_by_id(self, article_id):
+        """retrieves articles by id
+
+        Args:
+            article_id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         articles = self.client.Articles.allArticles.find({"id": article_id})
         for article in articles:
             return article
@@ -89,6 +112,7 @@ class Article:
         return 200
 
     def repost_article(self, user_id, article_id, add=True):
+        """reposts an article"""
         op = "$push" if add else "$pull"
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -104,42 +128,7 @@ class Article:
         return 200
 
     def remove_likes_articles(self, user_id, article_id):
-        self.client.Users.users.update_one(
-            {"user_id": user_id},
-            {
-                "$pull": {
-                    "liked_articles": article_id,
-                }
-            },
-        )
-        self.client.Articles.allArticles.update_one(
-            {"id": article_id}, {"$dec": {"likes": 1}}
-        )
-        return 200
-
-    def push_new_comment(self, user_name, article_id, comment, add=True):
-        # add comment to user document(comment, article_id)
-        op = "$push" if add else "$pull"
-        # self.client.Users.users.update_one({"user_id":user_id},{op:{'comments': {'comment':comment,'article_id':article_id}}})
-        # add comment to article document(comment,user_name)
-        self.client.Articles.allArticles.update_one(
-            {"id": article_id},
-            {op: {"comments": {"comment": comment, "user_name": user_name}}},
-        )
-        self.client.Users.users.update_one(
-            {"user_id": user_id},
-            {
-                "$push": {
-                    "liked_articles": article_id,
-                }
-            },
-        )
-        self.client.Articles.allArticles.update_one(
-            {"id": article_id}, {"$inc": {"likes": 1}}
-        )
-        return 200
-
-    def remove_likes_articles(self, user_id, article_id):
+        """remove likes from an article id and on the user id"""
         self.client.Users.users.update_one(
             {"user_id": user_id},
             {
@@ -154,7 +143,7 @@ class Article:
         return 200
 
     def push_new_comment(self, user_name, article_id, comment):
-        # add comment to user document(comment, article_id)
+        """add comment to user document(comment, article_id)"""
         self.client.Users.users.update_one(
             {"id": article_id},
             {"$push": {"comments": {"comment": comment, "user_name": user_name}}},
@@ -167,6 +156,7 @@ class Article:
         return 200
 
     def push_new_articles(self, articles):
+        """inserts new articles to database"""
         inserted = 0
         logger.info("trying to insert {} articles".format(len(articles)))
         for article in articles:
@@ -181,6 +171,7 @@ class Article:
         return ({"msg": "success"}, 200)
 
     def push_new_like(self, user_id, article_id):
+        """adds a new like to article id and user id"""
         # add like article document
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -197,6 +188,7 @@ class Article:
         return 200
 
     def push_new_view(self, user_id, article_id):
+        """adds viewed article id to user id"""
         # stores article id, headline, sentiment in user object
         article_data = self.get_article_by_id(article_id)
         article_data["date"] = time.time()
@@ -206,6 +198,7 @@ class Article:
         return 200, "success"
 
     def push_new_save(self, user_id, article_id):
+        """add saved article id to user information"""
         # add save to user doccument
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -222,6 +215,7 @@ class Article:
         return "success", 200
 
     def delete_save(self, user_id, article_id):
+        """delete a saved article id from the user"""
         # add save to user doccument
         self.client.Users.users.update_one(
             {"user_id": user_id},
@@ -238,8 +232,8 @@ class Article:
         return 200
 
     def delete_like(self, user_id, article_id):
+        """removes user's like from an article"""
         # add like article document
-        # add like article doccument
         self.client.Users.users.update_one(
             {"user_id": user_id}, {"$pull": {"liked_articles": article_id}}
         )
@@ -250,6 +244,7 @@ class Article:
         return 200
 
     def get_article_list(self, article_ids, n=10):
+        """gets like of a list of articles"""
         article_ls = []
         cur = self.client.Articles.allArticles.find(
             {"id": {"$in": list(article_ids)}}
@@ -259,14 +254,3 @@ class Article:
             article_ls.append(article)
 
         return article_ls
-
-    def delete_like(self, user_id, article_id):
-        # add like article document
-        self.client.Users.users.update_one(
-            {"user_id": user_id}, {"$pull": {"liked_articles": article_id}}
-        )
-        # add article id to user document
-        self.client.Articles.allArticles.update_one(
-            {"id": article_id}, {"$inc": {"likes": -1}}
-        )
-        return 200

@@ -27,6 +27,14 @@ def new_user_template(user_name, email, first_name="", last_name="", interests=[
 
 
 def valid_email(email=""):
+    """checks if email is valid
+
+    Args:
+        email (str, optional): email address. Defaults to "".
+
+    Returns:
+        str or none: returns parsed email if valid else none
+    """
     try:
         valid = validate_email(email)
         return valid.email
@@ -35,6 +43,14 @@ def valid_email(email=""):
 
 
 def verify_data(data):
+    """verifies that the data inputted is valid
+
+    Args:
+        data (dict): dictionary of data
+
+    Returns:
+        dict, int: returns if anything failed and the http code
+    """
     if data:
         if len(data) == 0:
             logger.info("failed data verification")
@@ -58,6 +74,14 @@ def verify_data(data):
 
 
 def create_user_dataframe(data):
+    """helper to create a user dataframe from inputted data
+
+    Args:
+        data (dict): data input of new user information
+
+    Returns:
+        message, int: returns a message or the user information and http code
+    """
     verification = verify_data(data)
     if 200 not in verification:
         return verification

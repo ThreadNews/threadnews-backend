@@ -1,17 +1,20 @@
 import configparser
 import logging
 import os
-import json
 
 logger = logging.getLogger("root")
 
 
 class threadConfiguration:
+    """gets configuration for program"""
+
     def __init__(self):
         self.config = configparser.ConfigParser()
         self.read_from_config_file()
 
     def read_from_config_file(self):
+        """reads configuration from file"""
+
         if not os.path.exists(".config/api.conf"):
             if not os.path.exists(".config"):
                 os.mkdir(".config")
@@ -20,6 +23,7 @@ class threadConfiguration:
             self.config.add_section("MongoDB")
             self.config.add_section("JWT")
 
+            """ read from environmental vars """
             if self.read_env_vars():
                 logger.critical("no environmental variables found")
                 config_file = open(".config/api.conf", "w")
@@ -27,10 +31,17 @@ class threadConfiguration:
                 config_file.close()
                 logger.critical("missing data/env vars, please add to .config/api.conf")
         else:
+            """only if configuration file is found"""
             logger.info("configuration found")
             self.config.read(".config/api.conf")
 
     def read_env_vars(self):
+        """reads off environmental vars
+
+        Returns:
+            boolean: true if all environmental vars are found
+        """
+
         api_key = os.environ.get("NEWSAPIKEY")
         url = os.environ.get("MONGOURL")
         user = os.environ.get("MONGOUSER")
@@ -60,9 +71,11 @@ class threadConfiguration:
         return None in [api_key, url, user, password, jwt_secret]
 
     def get_configuration(self):
+        """returns the configuration file"""
         return self.config
 
     def get_api_keys(self):
+        """gets the api key(s)"""
         api_key = self.config["NewsAPI"]["key"]
         if "," in api_key:
             return [key.strip() for key in api_key.split(",")]

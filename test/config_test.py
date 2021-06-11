@@ -3,6 +3,11 @@ from utils.config import threadConfiguration
 import os
 
 
+"""
+Tests to check configuration files or environmental variables
+"""
+
+
 @pytest.fixture
 def config():
     return threadConfiguration()

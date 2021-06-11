@@ -80,8 +80,9 @@ def get_interest_thread():
     data = request.get_json(force=True)
 
     if data["topic"] == "":
-        articles = database_client.client.Articles.allArticles.find()
+        articles = database_client.client.Articles.allArticles.find({}).sort("_id", -1)
     else:
+        print(data["n"])
         articles = database_client.client.Articles.allArticles.find(
             {"main_topic": data["topic"]}
         ).limit(data["n"])

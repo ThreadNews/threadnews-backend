@@ -2,6 +2,11 @@ import pytest
 import utils.login as Login
 
 
+"""
+Test login functionality
+"""
+
+
 @pytest.fixture
 def good_data():
     return {"email": "test@gmail.com", "username": "tester2", "password": "pass"}

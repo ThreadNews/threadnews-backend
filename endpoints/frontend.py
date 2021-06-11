@@ -29,6 +29,9 @@ def get_podcasts():
         data = request.get_json(force=True)
         interest_list = data["interest_list"]
         spot = Podcast()
-        random_pods = database_client.get_all_podcasts()
+        if "topic" in data.keys():
+            random_pods = database_client.get_all_podcasts(q={"topic": data["topic"]})
+        else:
+            random_pods = database_client.get_all_podcasts()
 
         return {"podcasts": random_pods}, 200

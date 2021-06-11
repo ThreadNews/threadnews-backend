@@ -65,9 +65,10 @@ class User:
 
     def update_user_interest(self, user_id, add=None, remove=None):
         msg = "user not added or removed"
-        if add: 
+        if add:
             self.client.Users.users.update_one(
-                {"user_id": user_id}, {"$set": {"interests": {"$each": add}}})
+                {"user_id": user_id}, {"$set": {"interests": {"$each": add}}}
+            )
             msg = "user added"
         if remove:
             self.client.Users.users.update_one(
@@ -121,5 +122,3 @@ class User:
         if type(user_ls) == dict:
             user_ls = list(user_ls.values())
         return self.get_user(q={"user_id": {"$in": user_ls}})
-
-    

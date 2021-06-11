@@ -3,7 +3,7 @@ from backend_vars import database_client
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import logging
 
-logger = logging.getLogger('root')
+logger = logging.getLogger("root")
 article_blueprint = Blueprint("article_blueprint", __name__)
 
 
